@@ -1,0 +1,1 @@
+Copy all DLLs from "Kingdoms and Castles\KingdomsAndCastles_Data\Managed" into this directory so Visual Studio can use them as references.

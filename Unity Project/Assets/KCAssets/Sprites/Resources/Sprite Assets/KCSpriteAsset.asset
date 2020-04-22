@@ -1,0 +1,512 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84a92b25f83d49b9bc132d206b370281, type: 3}
+  m_Name: KCSpriteAsset
+  m_EditorClassIdentifier: 
+  hashCode: -52333555
+  material: {fileID: 21474396240706334}
+  materialHashCode: 0
+  m_Version: 1.1.0
+  spriteSheet: {fileID: 2800000, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  m_SpriteCharacterTable:
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 0
+    m_Scale: 1
+    m_Name: icon_charcoal
+    m_HashCode: 1513966061
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 1
+    m_Scale: 1.5
+    m_Name: icon_food
+    m_HashCode: -1801509802
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 2
+    m_Scale: 1
+    m_Name: icon_gold
+    m_HashCode: -1801549996
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 3
+    m_Scale: 1.2
+    m_Name: icon_iron
+    m_HashCode: -1801357202
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 4
+    m_Scale: 1
+    m_Name: icon_stone
+    m_HashCode: 664358935
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 5
+    m_Scale: 1
+    m_Name: icon_wood
+    m_HashCode: -1802124825
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 6
+    m_Scale: 1.35
+    m_Name: icon_tools
+    m_HashCode: 653907711
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 7
+    m_Scale: 1.1
+    m_Name: icon_armaments
+    m_HashCode: 271617738
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 8
+    m_Scale: 1.2
+    m_Name: icon_magglass
+    m_HashCode: -1597487723
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 9
+    m_Scale: 1
+    m_Name: icon_person
+    m_HashCode: 236067713
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 10
+    m_Scale: 1.1
+    m_Name: icon_fish
+    m_HashCode: -1801516480
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 11
+    m_Scale: 1.4
+    m_Name: icon_apple
+    m_HashCode: 675361756
+  - m_ElementType: 2
+    m_Unicode: 0
+    m_GlyphIndex: 12
+    m_Scale: 1.1
+    m_Name: icon_pork
+    m_HashCode: -1802155790
+  m_SpriteGlyphTable:
+  - m_Index: 0
+    m_Metrics:
+      m_Width: 128
+      m_Height: 105.6
+      m_HorizontalBearingX: -4.8
+      m_HorizontalBearingY: 81.1
+      m_HorizontalAdvance: 125.3
+    m_GlyphRect:
+      m_X: 0
+      m_Y: 523
+      m_Width: 128
+      m_Height: 105
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300000, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 1
+    m_Metrics:
+      m_Width: 123.9
+      m_Height: 119.1
+      m_HorizontalBearingX: -4.3
+      m_HorizontalBearingY: 85.5
+      m_HorizontalAdvance: 112.8
+    m_GlyphRect:
+      m_X: 135
+      m_Y: 512
+      m_Width: 123
+      m_Height: 119
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300002, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 2
+    m_Metrics:
+      m_Width: 120.6
+      m_Height: 122.6
+      m_HorizontalBearingX: -1.3
+      m_HorizontalBearingY: 104.1
+      m_HorizontalAdvance: 128
+    m_GlyphRect:
+      m_X: 262
+      m_Y: 513
+      m_Width: 120
+      m_Height: 122
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300004, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 3
+    m_Metrics:
+      m_Width: 115.9
+      m_Height: 125.9
+      m_HorizontalBearingX: 4.1
+      m_HorizontalBearingY: 88.8
+      m_HorizontalAdvance: 128
+    m_GlyphRect:
+      m_X: 392
+      m_Y: 512
+      m_Width: 115
+      m_Height: 125
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300006, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 4
+    m_Metrics:
+      m_Width: 128
+      m_Height: 128
+      m_HorizontalBearingX: 0
+      m_HorizontalBearingY: 119.5
+      m_HorizontalAdvance: 128
+    m_GlyphRect:
+      m_X: 512
+      m_Y: 512
+      m_Width: 128
+      m_Height: 128
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300008, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 5
+    m_Metrics:
+      m_Width: 125.27
+      m_Height: 125.3
+      m_HorizontalBearingX: -1.2
+      m_HorizontalBearingY: 108.09
+      m_HorizontalAdvance: 128
+    m_GlyphRect:
+      m_X: 1
+      m_Y: 384
+      m_Width: 125
+      m_Height: 125
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300010, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 6
+    m_Metrics:
+      m_Width: 122.91
+      m_Height: 124
+      m_HorizontalBearingX: -8.92
+      m_HorizontalBearingY: 82.5
+      m_HorizontalAdvance: 107.2
+    m_GlyphRect:
+      m_X: 128
+      m_Y: 384
+      m_Width: 122
+      m_Height: 124
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300012, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 7
+    m_Metrics:
+      m_Width: 124.7
+      m_Height: 126.9
+      m_HorizontalBearingX: -4
+      m_HorizontalBearingY: 88.1
+      m_HorizontalAdvance: 128
+    m_GlyphRect:
+      m_X: 262
+      m_Y: 384
+      m_Width: 124
+      m_Height: 126
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300016, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 8
+    m_Metrics:
+      m_Width: 128
+      m_Height: 128
+      m_HorizontalBearingX: -8.66
+      m_HorizontalBearingY: 96.8
+      m_HorizontalAdvance: 128
+    m_GlyphRect:
+      m_X: 384
+      m_Y: 384
+      m_Width: 128
+      m_Height: 128
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300014, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 9
+    m_Metrics:
+      m_Width: 128
+      m_Height: 128
+      m_HorizontalBearingX: -64
+      m_HorizontalBearingY: 64
+      m_HorizontalAdvance: 128
+    m_GlyphRect:
+      m_X: 512
+      m_Y: 384
+      m_Width: 128
+      m_Height: 128
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300018, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 10
+    m_Metrics:
+      m_Width: 117
+      m_Height: 97.9
+      m_HorizontalBearingX: -11.93
+      m_HorizontalBearingY: 66.1
+      m_HorizontalAdvance: 123
+    m_GlyphRect:
+      m_X: 0
+      m_Y: 274
+      m_Width: 117
+      m_Height: 97
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300020, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 11
+    m_Metrics:
+      m_Width: 134.8
+      m_Height: 141.57
+      m_HorizontalBearingX: -14.15
+      m_HorizontalBearingY: 84.5
+      m_HorizontalAdvance: 135.9
+    m_GlyphRect:
+      m_X: 122
+      m_Y: 243
+      m_Width: 134
+      m_Height: 141
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300022, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - m_Index: 12
+    m_Metrics:
+      m_Width: 124.4
+      m_Height: 120
+      m_HorizontalBearingX: -2.5
+      m_HorizontalBearingY: 95.5
+      m_HorizontalAdvance: 121.9
+    m_GlyphRect:
+      m_X: 258
+      m_Y: 255
+      m_Width: 124
+      m_Height: 120
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 21300024, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  spriteInfoList:
+  - id: 0
+    x: 0
+    y: 523.4
+    width: 128
+    height: 105.6
+    xOffset: -4.8
+    yOffset: 81.1
+    xAdvance: 125.3
+    scale: 1
+    name: icon_charcoal
+    hashCode: 1513966061
+    unicode: 0
+    pivot: {x: -2.6198864, y: 65.49707}
+    sprite: {fileID: 21300000, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 1
+    x: 135.2
+    y: 512
+    width: 123.9
+    height: 119.1
+    xOffset: -4.3
+    yOffset: 85.5
+    xAdvance: 112.8
+    scale: 1.5
+    name: icon_food
+    hashCode: -1801509802
+    unicode: 0
+    pivot: {x: -64, y: 64}
+    sprite: {fileID: 21300002, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 2
+    x: 262.5
+    y: 513
+    width: 120.6
+    height: 122.6
+    xOffset: -1.3
+    yOffset: 104.1
+    xAdvance: 128
+    scale: 1
+    name: icon_gold
+    hashCode: -1801549996
+    unicode: 0
+    pivot: {x: -64, y: 64}
+    sprite: {fileID: 21300004, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 3
+    x: 392.3
+    y: 512
+    width: 115.9
+    height: 125.9
+    xOffset: 4.1
+    yOffset: 88.8
+    xAdvance: 128
+    scale: 1.2
+    name: icon_iron
+    hashCode: -1801357202
+    unicode: 0
+    pivot: {x: -64, y: 64}
+    sprite: {fileID: 21300006, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 4
+    x: 512
+    y: 512
+    width: 128
+    height: 128
+    xOffset: 0
+    yOffset: 119.5
+    xAdvance: 128
+    scale: 1
+    name: icon_stone
+    hashCode: 664358935
+    unicode: 0
+    pivot: {x: 0, y: 128}
+    sprite: {fileID: 21300008, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 5
+    x: 1
+    y: 384
+    width: 125.27
+    height: 125.3
+    xOffset: -1.2
+    yOffset: 108.09
+    xAdvance: 128
+    scale: 1
+    name: icon_wood
+    hashCode: -1802124825
+    unicode: 0
+    pivot: {x: -64, y: 64}
+    sprite: {fileID: 21300010, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 6
+    x: 128
+    y: 384
+    width: 122.91
+    height: 124
+    xOffset: -8.92
+    yOffset: 82.5
+    xAdvance: 107.2
+    scale: 1.35
+    name: icon_tools
+    hashCode: 653907711
+    unicode: 0
+    pivot: {x: -64, y: 64}
+    sprite: {fileID: 21300012, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 7
+    x: 262.9
+    y: 384
+    width: 124.7
+    height: 126.9
+    xOffset: -4
+    yOffset: 88.1
+    xAdvance: 128
+    scale: 1.1
+    name: icon_armaments
+    hashCode: 271617738
+    unicode: 0
+    pivot: {x: -64, y: 64}
+    sprite: {fileID: 21300016, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 8
+    x: 384
+    y: 384
+    width: 128
+    height: 128
+    xOffset: -8.66
+    yOffset: 96.8
+    xAdvance: 128
+    scale: 1.2
+    name: icon_magglass
+    hashCode: -1597487723
+    unicode: 0
+    pivot: {x: -64, y: 64}
+    sprite: {fileID: 21300014, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 9
+    x: 512
+    y: 384
+    width: 128
+    height: 128
+    xOffset: -64
+    yOffset: 64
+    xAdvance: 128
+    scale: 1
+    name: icon_person
+    hashCode: 236067713
+    unicode: 0
+    pivot: {x: -64, y: 64}
+    sprite: {fileID: 21300018, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 10
+    x: 0
+    y: 274.7
+    width: 117
+    height: 97.9
+    xOffset: -11.93
+    yOffset: 66.1
+    xAdvance: 123
+    scale: 1.1
+    name: icon_fish
+    hashCode: -1801516480
+    unicode: 0
+    pivot: {x: -64, y: 64}
+    sprite: {fileID: 21300020, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 11
+    x: 122
+    y: 243.9
+    width: 134.8
+    height: 141.57
+    xOffset: -14.15
+    yOffset: 84.5
+    xAdvance: 135.9
+    scale: 1.4
+    name: icon_apple
+    hashCode: 675361756
+    unicode: 0
+    pivot: {x: -63.5, y: 63.5}
+    sprite: {fileID: 21300022, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  - id: 12
+    x: 258.54
+    y: 255
+    width: 124.4
+    height: 120
+    xOffset: -2.5
+    yOffset: 95.5
+    xAdvance: 121.9
+    scale: 1.1
+    name: icon_pork
+    hashCode: -1802155790
+    unicode: 0
+    pivot: {x: -64.5, y: 63}
+    sprite: {fileID: 21300024, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+  fallbackSpriteAssets: []
+--- !u!21 &21474396240706334
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: TextMeshPro/Sprite
+  m_Shader: {fileID: 4800000, guid: cf81c85f95fe47e1a27f6ae460cf182c, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 468fa59ca50965b41b2f272cf04ac899, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _ColorMask: 15
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _UseUIAlphaClip: 0
+    m_Colors:
+    - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
