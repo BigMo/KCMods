@@ -17,10 +17,12 @@ The "Scripts" Visual Studio solution contains all code of my mods and mod framew
 
 ### Setup
 
-In order to make set it up in your machine, follow these steps:
+In order to set this repo up on your machine, follow these steps:
 
 1. Clone or download the respository
 2. Copy all Libraries (`*.dll` files) from the folder games' folder `Kingdoms and Castles\KingdomsAndCastles_Data\Managed` into the folder `Scripts\GameData`. This way Visual Studio will detect all references to the game's code and libraries.
+
+_> Note: If all you wish to do is interface with the mod menu, please read the [wiki article](https://github.com/BigMo/KCMods/wiki/Zat.ModMenu.API) instead!_
 
 ### Create your own Mod
 
