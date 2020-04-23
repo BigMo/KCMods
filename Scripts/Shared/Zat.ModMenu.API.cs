@@ -419,7 +419,7 @@ namespace Zat.Shared.ModMenu.API
             return $"{name} {version} by {author}";
         }
     }
-    public class SettingsEntry : Copyable<SettingsEntry>
+    public class SettingsEntry : Copyable<SettingsEntry>, Updatable<SettingsEntry>
     {
         /// <summary>
         /// Consists of the category/categories the entry resides in and its name.
@@ -500,6 +500,30 @@ namespace Zat.Shared.ModMenu.API
                     break;
             }
         }
+
+        public bool UpdateableFrom(SettingsEntry other)
+        {
+            if (description != other.description || type != other.type) return true;
+            switch(type)
+            {
+                case EntryType.Button:
+                    if (button != null) return button.UpdateableFrom(other.button);
+                    break;
+                case EntryType.Color:
+                    if (color != null) return color.UpdateableFrom(other.color);
+                    break;
+                case EntryType.Select:
+                    if (select != null) return select.UpdateableFrom(other.select);
+                    break;
+                case EntryType.Slider:
+                    if (slider != null) return slider.UpdateableFrom(other.slider);
+                    break;
+                case EntryType.Toggle:
+                    if (toggle != null) return toggle.UpdateableFrom(other.toggle);
+                    break;
+            }
+            return false;
+        }
     }
     /// <summary>
     /// Defines functionality to copy information from other objects
@@ -509,7 +533,15 @@ namespace Zat.Shared.ModMenu.API
     {
         void CopyFrom(T other);
     }
-    public class Button : Copyable<Button>
+    /// <summary>
+    /// Defines functionality to determine whether another object provides any information different from its own
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface Updatable<T>
+    {
+        bool UpdateableFrom(T other);
+    }
+    public class Button : Copyable<Button>, Updatable<Button>
     {
         public string label;
 
@@ -517,8 +549,13 @@ namespace Zat.Shared.ModMenu.API
         {
             label = other.label;
         }
+
+        public bool UpdateableFrom(Button other)
+        {
+            return label != other.label;
+        }
     }
-    public class Slider : Copyable<Slider>
+    public class Slider : Copyable<Slider>, Updatable<Slider>
     {
         public float min, max, value;
         public bool wholeNumbers;
@@ -532,8 +569,13 @@ namespace Zat.Shared.ModMenu.API
             label = other.label;
             wholeNumbers = other.wholeNumbers;
         }
+
+        public bool UpdateableFrom(Slider other)
+        {
+            return min != other.min || max != other.max || value != other.value || wholeNumbers != other.wholeNumbers || label != other.label;
+        }
     }
-    public class Select : Copyable<Select>
+    public class Select : Copyable<Select>, Updatable<Select>
     {
         public string[] options;
         public int value;
@@ -543,8 +585,13 @@ namespace Zat.Shared.ModMenu.API
             options = other.options;
             value = other.value;
         }
+
+        public bool UpdateableFrom(Select other)
+        {
+            return value != other.value || !options.SequenceEqual(other.options);
+        }
     }
-    public class Toggle : Copyable<Toggle>
+    public class Toggle : Copyable<Toggle>, Updatable<Toggle>
     {
         public bool value;
         public string label;
@@ -554,8 +601,13 @@ namespace Zat.Shared.ModMenu.API
             value = other.value;
             label = other.label;
         }
+
+        public bool UpdateableFrom(Toggle other)
+        {
+            return value != other.value || label != other.label;
+        }
     }
-    public class Color : IEquatable<Color>, Copyable<Color>
+    public class Color : IEquatable<Color>, Copyable<Color>, Updatable<Color>
     {
         public float r, g, b, a;
 
@@ -575,6 +627,11 @@ namespace Zat.Shared.ModMenu.API
         public override string ToString()
         {
             return $"R({r.ToString("0.00")}) G({g.ToString("0.00")}) B({b.ToString("0.00")}) A({a.ToString("0.00")})";
+        }
+
+        public bool UpdateableFrom(Color other)
+        {
+            return !Equals(other);
         }
     }
     /// <summary>

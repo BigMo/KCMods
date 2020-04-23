@@ -34,7 +34,6 @@ namespace Zat.Minimap
         private float zoomFactor = 1f;
 
         private float updateInterval = 5f;
-        private bool indicator = true;
         private bool fixedMap = false;
         private bool dynamicZoom = false;
 
@@ -168,7 +167,7 @@ namespace Zat.Minimap
             proxy.AddSettingsChangedListener("Minimap/Visual/Indicator", (setting) =>
             {
                 arrow.gameObject.SetActive(setting.toggle.value);
-                setting.toggle.label = indicator ? "Visible" : "Hidden";
+                setting.toggle.label = setting.toggle.value ? "Visible" : "Hidden";
                 proxy.UpdateSetting(setting, null, null);
             });
             proxy.AddSettingsChangedListener("Minimap/Visual/Position X", (setting) =>

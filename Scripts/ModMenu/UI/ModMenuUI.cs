@@ -19,13 +19,14 @@ namespace Zat.ModMenu.UI
         public static ModMenuUI Instance { get; private set; }
         private TextMeshProUGUI header;
         private UnityEngine.UI.Button collapseExpand, reset, save, close;
-        private TextMeshProUGUI saveText, resetText;
-        private GameObject content;
+        private TextMeshProUGUI saveText, resetText, noModsText, collapseExpandText;
+        private GameObject content, noMods;
         private IMCPort port;
         private GameObject ui;
         private SettingsManager settings;
         private SettingsEntry[] savedSettings;
         private bool isSaving = false;
+        private bool collapseExpandState = false;
 
         public string Header
         {
@@ -44,12 +45,15 @@ namespace Zat.ModMenu.UI
                 transform.name = ModSettingsNames.Objects.ModMenuName;
                 header = transform.Find("ModSettingsUI/Header/Text")?.GetComponent<TextMeshProUGUI>();
                 collapseExpand = transform.Find("ModSettingsUI/CollapseExpand")?.GetComponent<UnityEngine.UI.Button>();
+                collapseExpandText = transform.Find("ModSettingsUI/CollapseExpand/Text")?.GetComponent<TextMeshProUGUI>();
                 reset = transform.Find("ModSettingsUI/Reset")?.GetComponent<UnityEngine.UI.Button>();
                 resetText = transform.Find("ModSettingsUI/Reset/Text")?.GetComponent<TextMeshProUGUI>();
                 save = transform.Find("ModSettingsUI/Save")?.GetComponent<UnityEngine.UI.Button>();
                 saveText = transform.Find("ModSettingsUI/Save/Text")?.GetComponent<TextMeshProUGUI>();
                 close = transform.Find("ModSettingsUI/Close")?.GetComponent<UnityEngine.UI.Button>();
                 content = transform.Find("ModSettingsUI/Scroll View/Viewport/Content")?.gameObject;
+                noMods = transform.Find("ModSettingsUI/NoMods")?.gameObject;
+                noModsText = transform.Find("ModSettingsUI/NoMods/Text")?.GetComponent<TextMeshProUGUI>();
                 port = gameObject.AddComponent<IMCPort>();
                 settings = new SettingsManager(content, OnUIUpdate);
 
@@ -63,22 +67,23 @@ namespace Zat.ModMenu.UI
                         port.RPC(mod, ModSettingsNames.Events.ResetIssued, 5f, null, null);
                 });
                 save.onClick.AddListener(() => { if (!isSaving) StartCoroutine(SaveSettingsAnim()); });
-                //TODO: Add OnSave event to API
-                //TODO: Add Loading to API lol
+                collapseExpand.onClick.AddListener(() => ToggleCollapseExpand());
 
                 if (gameObject.name != ModSettingsNames.Objects.ModMenuName)
                     Loader.Helper.Log($"{nameof(ModMenuUI)} is attached to \"{gameObject.name}\" instead of \"{ModSettingsNames.Objects.ModMenuName}\"!");
 
                 header.alignment = TextAlignmentOptions.Midline;
-                var collapseExpandText = collapseExpand?.transform.Find("Text")?.GetComponent<TextMeshProUGUI>();
                 saveText.alignment = TextAlignmentOptions.Midline;
                 resetText.alignment = TextAlignmentOptions.Midline;
                 collapseExpandText.alignment = TextAlignmentOptions.Midline;
+                noModsText.alignment = TextAlignmentOptions.Midline;
 
                 port.RegisterReceiveListener<SettingsEntry>(ModSettingsNames.Methods.UpdateSetting, UpdateSettingHandler);
                 port.RegisterReceiveListener<ModConfig>(ModSettingsNames.Methods.RegisterMod, RegisterModHandler);
 
                 savedSettings = LoadSettings();
+                ui.SetActive(false);
+                ToggleCollapseExpand();
 
                 Loader.Helper.Log($"Started: [{transform.parent?.name ?? "-"}] -> [{transform.name}] -> [{nameof(ModMenuUI)}]");
             }
@@ -89,6 +94,22 @@ namespace Zat.ModMenu.UI
             }
         }
 
+        private void ToggleCollapseExpand()
+        {
+            SetCollapseExpand(!collapseExpandState);
+        }
+        private void SetCollapseExpand(bool value)
+        {
+            collapseExpandState = value;
+            if (collapseExpandState)
+                collapseExpandText.text = "Collapse all";
+            else
+                collapseExpandText.text = "Expand all";
+
+            var categories = content.GetComponentsInChildren<CategoryEntry>(true);
+            foreach (var cat in categories)
+                cat.Expanded = collapseExpandState;
+        }
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.O))
@@ -142,6 +163,8 @@ namespace Zat.ModMenu.UI
                 var _saved = savedSettings != null ? savedSettings.Where(s => mod.settings.Any(m => m.path == s.path)).ToArray() : new SettingsEntry[0];
                 handler.SendResponse(port.gameObject.name, _saved);
                 LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
+                if (noMods != null) noMods.SetActive(!settings.Mods.Any());
+                SetCollapseExpand(false);
             }
             catch(Exception ex)
             {
@@ -177,10 +200,14 @@ namespace Zat.ModMenu.UI
                 handler.SendError(port.gameObject.name, $"Entry \"{entry.path}\" not registered!");
                 return;
             }
-            context.UpdateSetting(entry);
-            EntryHandler.Instance.UpdateEntry(context.Setting, context.UIElement);
+            if (context.Setting.UpdateableFrom(entry))
+            {
+                context.UpdateSetting(entry);
+                EntryHandler.Instance.UpdateEntry(context.Setting, context.UIElement);
+            }
             handler.SendResponse(port.gameObject.name);
         }
+
         public class UpdateFailedException : Exception
         {
             public UpdateFailedException(string reason) : base($"Failed to send UI update: {reason}") { }

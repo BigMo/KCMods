@@ -16,6 +16,7 @@ namespace Zat.ModMenu.UI.Entries
         private TextMeshProUGUI _name;
         private TextMeshProUGUI mods;
         private bool initialized = false;
+        private CategoryToggle categoryToggle;
 
         public string Name
         {
@@ -26,6 +27,21 @@ namespace Zat.ModMenu.UI.Entries
         {
             get { return mods?.text; }
             set { if (mods) mods.text = value; }
+        }
+        public bool Expanded
+        {
+            get { return toggle?.isOn ?? false; }
+            set
+            {
+                if (toggle) toggle.isOn = value;
+                categoryToggle.UpdateImage();
+                ExpandCollapse(value);
+            }
+        }
+        public bool Collapsed
+        {
+            get { return !Expanded; }
+            set { Expanded = !value; }
         }
         public CategoryEntry Parent { get; set; }
 
@@ -54,7 +70,7 @@ namespace Zat.ModMenu.UI.Entries
         }
         private void SetupControls()
         {
-            var catToggle = toggle.gameObject.AddComponent<CategoryToggle>();
+            categoryToggle = toggle.gameObject.AddComponent<CategoryToggle>();
 
             if (toggle.onValueChanged == null) toggle.onValueChanged = new Toggle.ToggleEvent();
             toggle.onValueChanged.AddListener(ExpandCollapse);
