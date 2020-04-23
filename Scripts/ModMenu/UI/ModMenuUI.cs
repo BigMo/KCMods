@@ -81,6 +81,7 @@ namespace Zat.ModMenu.UI
                 resetText.alignment = TextAlignmentOptions.Midline;
                 collapseExpandText.alignment = TextAlignmentOptions.Midline;
                 noModsText.alignment = TextAlignmentOptions.Midline;
+                noMods.SetActive(true);
 
                 port.RegisterReceiveListener<SettingsEntry>(ModSettingsNames.Methods.UpdateSetting, UpdateSettingHandler);
                 port.RegisterReceiveListener<ModConfig>(ModSettingsNames.Methods.RegisterMod, RegisterModHandler);

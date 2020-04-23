@@ -26,6 +26,7 @@ namespace Zat.ModMenu.UI.Handlers
             handlers[EntryType.Select] = new SelectHandler();
             handlers[EntryType.Slider] = new SliderHandler();
             handlers[EntryType.Toggle] = new ToggleHandler();
+            handlers[EntryType.Hotkey] = new HotkeyHandler();
         }
 
         public BaseEntry CreateEntry(SettingsEntry data, UnityAction onUpdate)

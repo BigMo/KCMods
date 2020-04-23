@@ -272,6 +272,27 @@ namespace Zat.Shared.ModMenu.API
             return this;
         }
         /// <summary>
+        /// Adds a hotkey-button setting to the config
+        /// </summary>
+        /// <param name="path">Path of the setting</param>
+        /// <param name="description">Description of the setting</param>
+        /// <param name="keyCode">Initial key</param>
+        /// <returns></returns>
+        public ModConfigBuilder AddHotkey(string path, string description, int keyCode)
+        {
+            settings.Add(new SettingsEntry()
+            {
+                path = path,
+                description = description,
+                type = EntryType.Hotkey,
+                hotkey = new Hotkey()
+                {
+                    keyCode = keyCode
+                }
+            });
+            return this;
+        }
+        /// <summary>
         /// Adds a select (dropdown) setting to the config
         /// </summary>
         /// <param name="path">Path of the setting</param>
@@ -440,6 +461,7 @@ namespace Zat.Shared.ModMenu.API
         public Select select;
         public Toggle toggle;
         public Color color;
+        public Hotkey hotkey;
 
         /// <summary>
         /// Returns the individual path elements of this setting's path (split by '/')
@@ -503,6 +525,10 @@ namespace Zat.Shared.ModMenu.API
                     if (toggle != null) toggle.CopyFrom(other.toggle);
                     else toggle = other.toggle;
                     break;
+                case EntryType.Hotkey:
+                    if (hotkey != null) hotkey.CopyFrom(other.hotkey);
+                    else hotkey = other.hotkey;
+                    break;
             }
         }
 
@@ -525,6 +551,9 @@ namespace Zat.Shared.ModMenu.API
                     break;
                 case EntryType.Toggle:
                     if (toggle != null) return toggle.UpdateableFrom(other.toggle);
+                    break;
+                case EntryType.Hotkey:
+                    if (hotkey != null) return hotkey.UpdateableFrom(other.hotkey);
                     break;
             }
             return false;
@@ -639,6 +668,41 @@ namespace Zat.Shared.ModMenu.API
             return !Equals(other);
         }
     }
+    public class Hotkey : IEquatable<Hotkey>, Copyable<Hotkey>, Updatable<Hotkey>
+    {
+        public int keyCode;
+        public bool ctrl;
+        public bool alt;
+        public bool shift;
+
+        public void CopyFrom(Hotkey other)
+        {
+            keyCode = other.keyCode;
+            ctrl = other.ctrl;
+            alt = other.alt;
+            shift = other.shift;
+        }
+
+        public bool Equals(Hotkey other)
+        {
+            return keyCode == other.keyCode && ctrl == other.ctrl && alt == other.alt && shift == other.shift;
+        }
+
+        public bool UpdateableFrom(Hotkey other)
+        {
+            return !Equals(other);
+        }
+
+        public override string ToString()
+        {
+            var keys = new List<string>();
+            if (ctrl) keys.Add($"[Control]");
+            if (alt) keys.Add($"[Alt]");
+            if (shift) keys.Add($"[Shift]");
+            keys.Add($"[{(KeyCode)keyCode}]");
+            return string.Join(" + ", keys.ToArray());
+        }
+    }
     /// <summary>
     /// The type of a setting, determines data type and UI entry type
     /// </summary>
@@ -648,7 +712,8 @@ namespace Zat.Shared.ModMenu.API
         Slider = 1,
         Select = 2,
         Toggle = 3,
-        Color = 4
+        Color = 4,
+        Hotkey = 5
     }
     #endregion
 }

@@ -65,6 +65,7 @@ namespace Zat.Minimap
             }
         }
         private float CamRotation { get { return Cam.inst?.GetField<float>("Theta") ?? 0; } }
+        private KeyCode ToggleKey { get { return (KeyCode?)proxy?.Config["Minimap/Key"]?.hotkey.keyCode ?? KeyCode.M; } }
         public void Start()
         {
             try
@@ -109,7 +110,8 @@ namespace Zat.Minimap
 
                 ModSettingsBootstrapper.Register(ModConfigBuilder
                     .Create("Minimap", "v1.3", "Zat")
-                    .AddToggle("Minimap/Enabled", "Whether or not to show the map\n[Hotkey: M]", "Visible", true)
+                    .AddToggle("Minimap/Enabled", "Whether or not to show the map", "Visible", true)
+                    .AddHotkey("Minimap/Key", "What button to press to toggle the map on/off\nSet to [M]", (int)KeyCode.M)
                     .AddSlider("Minimap/Update Interval", "Interval between minimap updates", "Every 5.00s", 1, 30, true, 5)
                     .AddToggle("Minimap/Visual/Indicator", "Show/hide the rotation indicator (arrow)", "Visible", true)
                     .AddColor("Minimap/Visual/Indicator Color", "The color of the indicator", 0, 0, 0, 0.7f)
@@ -179,6 +181,10 @@ namespace Zat.Minimap
                 setting.slider.label = $"Size: {(int)setting.slider.value}px";
                 proxy.UpdateSetting(setting, null, null);
             });
+            proxy.AddSettingsChangedListener("Minimap/Key", (setting) => {
+                setting.description = $"What button to press to toggle the map on/off\nSet to {setting.hotkey.ToString()}";
+                proxy.UpdateSetting(setting, null, null);
+            });
             proxy.AddSettingsChangedListener("Minimap/Visual/Indicator Color", (setting) => {
                 arrowImage.color = new Color(setting.color.r, setting.color.g, setting.color.b, setting.color.a);
             });
@@ -241,7 +247,7 @@ namespace Zat.Minimap
         {
             if (Time.time > nextUpdate)
                 UpdateMap();
-            if (Input.GetKeyDown(KeyCode.M))
+            if (Input.GetKeyDown(ToggleKey))
             {
                 var setting = proxy.Config["Minimap/Enabled"];
                 setting.toggle.value = !setting.toggle.value;

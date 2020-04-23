@@ -270,6 +270,7 @@
     <Compile Include="ModMenu\UI\Entries\ButtonEntry.cs" />
     <Compile Include="ModMenu\UI\Entries\CategoryEntry.cs" />
     <Compile Include="ModMenu\UI\Entries\ColorEntry.cs" />
+    <Compile Include="ModMenu\UI\Entries\HotkeyEntry.cs" />
     <Compile Include="ModMenu\UI\Entries\SelectEntry.cs" />
     <Compile Include="ModMenu\UI\Entries\SliderEntry.cs" />
     <Compile Include="ModMenu\UI\Entries\ToggleEntry.cs" />
@@ -277,6 +278,7 @@
     <Compile Include="ModMenu\UI\Handlers\ColorHandler.cs" />
     <Compile Include="ModMenu\UI\Handlers\EntryHandler.cs" />
     <Compile Include="ModMenu\UI\Handlers\IEntryHandler.cs" />
+    <Compile Include="ModMenu\UI\Handlers\HotkeyHandler.cs" />
     <Compile Include="ModMenu\UI\Handlers\SelectHandler.cs" />
     <Compile Include="ModMenu\UI\Handlers\SliderHandler.cs" />
     <Compile Include="ModMenu\UI\Handlers\ToggleHandler.cs" />
