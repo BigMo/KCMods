@@ -182,6 +182,7 @@ namespace Zat.Minimap
                 setting.slider.label = $"Y: {setting.slider.value.ToString("0.00")}";
                 proxy.UpdateSetting(setting, null, null);
             });
+            proxy.AddResetIssuedListener(()=> { /* Implement Update-calls that restore default values */ });
 
             //Apply saved values
             foreach (var setting in saved)

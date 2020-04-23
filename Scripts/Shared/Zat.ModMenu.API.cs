@@ -203,6 +203,11 @@ namespace Zat.Shared.ModMenu.API
             if (!settingsEvents.ContainsKey(settingsPath)) settingsEvents[settingsPath] = new SettingsChangedEvent();
             settingsEvents[settingsPath].AddListener(callback);
         }
+        public void AddResetIssuedListener(UnityAction callback)
+        {
+            if (resetIssuedEvent == null) resetIssuedEvent = new ResetIssuedEvent();
+            resetIssuedEvent.AddListener(callback);
+        }
         /// <summary>
         /// Submits the change of a setting to the ModMenu
         /// </summary>
