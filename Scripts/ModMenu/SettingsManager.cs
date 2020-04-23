@@ -46,6 +46,16 @@ namespace Zat.ModMenu
         public IEnumerable<ModConfig> Mods { get { return mods.Select(m => m.Config); } }
         public IEnumerable<BaseEntry> UIElements { get { return settings.Select(s => s.UIElement); } }
         public IEnumerable<SettingsEntry> Settings { get { return settings.Select(s => s.Setting); } }
+        public IEnumerable<string> TopLevelCategories
+        {
+            get
+            {
+                return settings
+                    .Select(s => s.Setting.GetPathElements().FirstOrDefault())
+                    .Where(c => !string.IsNullOrEmpty(c))
+                    .Distinct();
+            }
+        }
 
         private List<SettingContext> settings;
         private List<ModContext> mods;
@@ -86,11 +96,21 @@ namespace Zat.ModMenu
                 {
                     var category = GetCategoryByPath(settingContext.Setting.GetCategoryPath());
                     if (!category) continue;
-
                     category.UpdateLayout();
-                    category.Mods = string.Join(", ", settingContext.SubscribedMods.Select(m => m.Config.ToString()).ToArray());
                 }
                 Loader.Helper.Log($"[ModMenu] Registered \"{config.ToString()}\"");
+
+                foreach (var topLevelCategory in TopLevelCategories)
+                {
+                    var category = GetCategoryByPath(topLevelCategory);
+                    if (!category) continue;
+                    var _mods = GetSettingsInCategory(topLevelCategory)
+                        .SelectMany(s => GetAssociatedMods(s))
+                        .Distinct()
+                        .Select(m => m.Config.ToString())
+                        .ToArray();
+                    category.Mods = string.Join(", ", _mods);
+                }
             }
             catch (Exception ex)
             {
@@ -119,6 +139,11 @@ namespace Zat.ModMenu
             var context = settings.FirstOrDefault(s => s.Setting.path == setting.path);
             if (context == null) throw new Exception($"Setting \"{setting.path}\" was not registered!");
             return context.SubscribedMods;
+        }
+
+        public IEnumerable<SettingsEntry> GetSettingsInCategory(string toplevel)
+        {
+            return settings.Select(s => s.Setting).Where(s => s.GetCategoryPath().FirstOrDefault() == toplevel);
         }
 
         private CategoryEntry GetCreateCategoryChain(SettingsEntry setting)

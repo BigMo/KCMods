@@ -11,6 +11,7 @@ using Zat.Shared.ModMenu.API;
 using Zat.ModMenu.UI.Handlers;
 using Zat.ModMenu.UI.Entries;
 using Newtonsoft.Json;
+using Zat.Shared.UI.Utilities;
 
 namespace Zat.ModMenu.UI
 {
@@ -59,6 +60,9 @@ namespace Zat.ModMenu.UI
 
                 ui = transform.Find("ModSettingsUI")?.gameObject;
                 Instance = this;
+
+                var drag = header.gameObject.AddComponent<DraggableRect>();
+                drag.movable = ui?.GetComponent<RectTransform>();
 
                 close.onClick.AddListener(() => ui.SetActive(false));
                 reset.onClick.AddListener(() =>

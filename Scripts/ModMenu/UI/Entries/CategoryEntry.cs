@@ -77,6 +77,7 @@ namespace Zat.ModMenu.UI.Entries
 
             _name.alignment = TextAlignmentOptions.MidlineLeft;
             mods.alignment = TextAlignmentOptions.MidlineRight;
+            mods.text = "";
         }
 
         private void ExpandCollapse(bool expanded)

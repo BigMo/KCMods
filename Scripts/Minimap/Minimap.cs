@@ -17,6 +17,7 @@ using UnityEngine.UI;
 using TMPro;
 using Button = UnityEngine.UI.Button;
 using UnityEngine.EventSystems;
+using Zat.Shared.UI.Utilities;
 
 namespace Zat.Minimap
 {
@@ -38,13 +39,14 @@ namespace Zat.Minimap
         private bool dynamicZoom = false;
 
         private GameObject mapUI;
-        private RectTransform header, mapBody, mapTexture, arrow;
+        private RectTransform header, mapBody, mapTexture, arrowBody, arrowImageBody;
+        private Image arrowImage;
         private RawImage mapImage;
         private Button headerButton;
 
         private ModSettingsProxy proxy;
 
-        private Vector2 WorldSize { get { return new Vector2(World.inst.GetField<int>("gridWidth"), World.inst.GetField<int>("gridHeight")); } }
+        private Vector2 WorldSize { get { return new Vector2(World.inst?.GetField<int>("gridWidth") ?? 0, World.inst?.GetField<int>("gridHeight") ?? 0); } }
         private Vector2 CamPosition { get { return new Vector2(Cam.inst?.TrackingPos.x ?? 0, Cam.inst?.TrackingPos.z ?? 0); } }
         private float CameraZoom
         {
@@ -84,7 +86,9 @@ namespace Zat.Minimap
                 header = gameObject.transform.Find("MapUI/Header")?.GetComponent<RectTransform>();
                 mapBody = gameObject.transform.Find("MapUI/MapBody")?.GetComponent<RectTransform>();
                 mapTexture = gameObject.transform.Find("MapUI/MapBody/Margin/MapTexture")?.GetComponent<RectTransform>();
-                arrow = gameObject.transform.Find("MapUI/MapBody/Margin/MapTexture/Arrow")?.GetComponent<RectTransform>();
+                arrowBody = gameObject.transform.Find("MapUI/MapBody/Margin/MapTexture/Arrow")?.GetComponent<RectTransform>();
+                arrowImage = gameObject.transform.Find("MapUI/MapBody/Margin/MapTexture/Arrow/Image")?.GetComponent<Image>();
+                arrowImageBody = gameObject.transform.Find("MapUI/MapBody/Margin/MapTexture/Arrow/Image")?.GetComponent<RectTransform>();
                 mapImage = gameObject.transform.Find("MapUI/MapBody/Margin/MapTexture")?.GetComponent<RawImage>();
                 headerButton = gameObject.transform.Find("MapUI/Header/Close")?.GetComponent<Button>();
                 var headerText = gameObject.transform.Find("MapUI/Header/Text")?.GetComponent<TextMeshProUGUI>();
@@ -94,7 +98,11 @@ namespace Zat.Minimap
                 trigger.eventID = EventTriggerType.PointerClick;
                 trigger.callback.AddListener(OnMapClick);
                 events.triggers.Add(trigger);
-                
+
+                var drag = header.gameObject.AddComponent<DraggableRect>();
+                drag.movable = mapUI?.GetComponent<RectTransform>();
+                drag.onMoved.AddListener(OnMoved);
+
                 SetSize(128);
                 SetPos(0, 0);
                 mapImage.texture = tex;
@@ -104,6 +112,8 @@ namespace Zat.Minimap
                     .AddToggle("Minimap/Enabled", "Whether or not to show the map\n[Hotkey: M]", "Visible", true)
                     .AddSlider("Minimap/Update Interval", "Interval between minimap updates", "Every 5.00s", 1, 30, true, 5)
                     .AddToggle("Minimap/Visual/Indicator", "Show/hide the rotation indicator (arrow)", "Visible", true)
+                    .AddColor("Minimap/Visual/Indicator Color", "The color of the indicator", 0, 0, 0, 0.7f)
+                    .AddSlider("Minimap/Visual/Indicator Size", "The size of the indicator", "Size: 16px", 4, 64, true, 16)
                     .AddSlider("Minimap/Visual/Size", "Width and height of the map in pixels", "Size: 128px", 100, 1024, true, 128)
                     .AddSlider("Minimap/Visual/Position X", "Where the map is placed horizontally", "X: 0", 0, Screen.width, true, 0)
                     .AddSlider("Minimap/Visual/Position Y", "Where the map is placed vertically", "Y: 0", 0, Screen.height, true, 0)
@@ -142,6 +152,17 @@ namespace Zat.Minimap
             if (!rect) return;
             rect.anchoredPosition = new Vector2(x, -y);
         }
+        private void OnMoved()
+        {
+            if (!proxy) return;
+            var posx = proxy.Config["Minimap/Visual/Position X"];
+            var posy = proxy.Config["Minimap/Visual/Position Y"];
+            var rect = mapUI.GetComponent<RectTransform>();
+            posx.slider.value = rect.anchoredPosition.x;
+            posy.slider.value = -rect.anchoredPosition.y;
+            proxy.UpdateSetting(posx, null, null);
+            proxy.UpdateSetting(posy, null, null);
+        }
 
 
         private void OnModRegistered(ModSettingsProxy proxy, SettingsEntry[] saved)
@@ -158,6 +179,14 @@ namespace Zat.Minimap
                 setting.slider.label = $"Size: {(int)setting.slider.value}px";
                 proxy.UpdateSetting(setting, null, null);
             });
+            proxy.AddSettingsChangedListener("Minimap/Visual/Indicator Color", (setting) => {
+                arrowImage.color = new Color(setting.color.r, setting.color.g, setting.color.b, setting.color.a);
+            });
+            proxy.AddSettingsChangedListener("Minimap/Visual/Indicator Size", (setting) => {
+                setting.slider.label = $"Size: {(int)setting.slider.value}px";
+                arrowImageBody.sizeDelta = new Vector2(setting.slider.value, setting.slider.value);
+                proxy.UpdateSetting(setting, null, null);
+            });
             proxy.AddSettingsChangedListener("Minimap/Update Interval", (setting) => {
                 updateInterval = setting.slider.value;
                 setting.slider.label = $"Every {(int)setting.slider.value}s";
@@ -166,7 +195,7 @@ namespace Zat.Minimap
             proxy.AddSettingsChangedListener("Minimap/Enabled", EnabledChanged);
             proxy.AddSettingsChangedListener("Minimap/Visual/Indicator", (setting) =>
             {
-                arrow.gameObject.SetActive(setting.toggle.value);
+                arrowBody.gameObject.SetActive(setting.toggle.value);
                 setting.toggle.label = setting.toggle.value ? "Visible" : "Hidden";
                 proxy.UpdateSetting(setting, null, null);
             });
@@ -250,8 +279,8 @@ namespace Zat.Minimap
         private void UpdateArrow()
         {
             var newPos = (Vector2.one * (proxy?.Config["Minimap/Visual/Size"]?.slider.value ?? 128)) * (Scroll * new Vector2(1,-1));
-            arrow.anchoredPosition = newPos;
-            arrow.rotation = Quaternion.Euler(0, 0, -CamRotation - 270);
+            arrowBody.anchoredPosition = newPos;
+            arrowBody.rotation = Quaternion.Euler(0, 0, -CamRotation - 270);
         }
     }
 }
