@@ -25,7 +25,7 @@ namespace Zat.Minimap
     {
         public static UnitIndicator Create()
         {
-            var prefab = Loader.Assets.GetPrefab("assets/workspace/Minimap/UnitIndicator.prefab");
+            var prefab = Loader.Assets.GetPrefab("assets/workspace/Minimap/UnitIndicatorFrame.prefab");
             if (!prefab) return null;
 
             var go = GameObject.Instantiate(prefab) as GameObject;

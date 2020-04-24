@@ -180,15 +180,15 @@ namespace Zat.Minimap
                     //Visual Indicators Army
                     .AddToggle("Minimap/Visual/Indicators/Armies/Enabled", "Show/hide armies as indicators", "Visible", true)
                     .AddColor("Minimap/Visual/Indicators/Armies/Color", "The color of the army indicators", 0, 0.88f, 1f, 0.9f)
-                    .AddSlider("Minimap/Visual/Indicators/Armies/Size", "The size of the army indicators", "Size: 16px", 4, 64, true, 16)
+                    .AddSlider("Minimap/Visual/Indicators/Armies/Size", "The size of the army indicators", "Size: 16px", 4, 64, true, 32)
                     //Visual Indicators Vikings
                     .AddToggle("Minimap/Visual/Indicators/Vikings/Enabled", "Show/hide vikings as indicators", "Visible", true)
                     .AddColor("Minimap/Visual/Indicators/Vikings/Color", "The color of the viking indicators", 1, 0.28f, 0, 0.9f)
-                    .AddSlider("Minimap/Visual/Indicators/Vikings/Size", "The size of the viking indicators", "Size: 16px", 4, 64, true, 16)
+                    .AddSlider("Minimap/Visual/Indicators/Vikings/Size", "The size of the viking indicators", "Size: 16px", 4, 64, true, 48)
                     //Visual Indicators Dragons
                     .AddToggle("Minimap/Visual/Indicators/Dragons/Enabled", "Show/hide dragons as indicators", "Visible", true)
                     .AddColor("Minimap/Visual/Indicators/Dragons/Color", "The color of the dragon indicators", 1, 0, 0, 0.9f)
-                    .AddSlider("Minimap/Visual/Indicators/Dragons/Size", "The size of the dragon indicators", "Size: 16px", 4, 64, true, 16)
+                    .AddSlider("Minimap/Visual/Indicators/Dragons/Size", "The size of the dragon indicators", "Size: 16px", 4, 64, true, 48)
 
                     .Build(),
                     OnModRegistered, (ex) => { });
@@ -422,7 +422,7 @@ namespace Zat.Minimap
             }
             if (proxy?.Config["Minimap/Visual/Indicators/Armies/Enabled"].toggle.value ?? false)
             {
-                var size = new Vector2(proxy.Config["Minimap/Visual/Indicators/Dragons/Size"].slider.value, proxy.Config["Minimap/Visual/Indicators/Armies/Size"].slider.value);
+                var size = new Vector2(proxy.Config["Minimap/Visual/Indicators/Armies/Size"].slider.value, proxy.Config["Minimap/Visual/Indicators/Armies/Size"].slider.value);
                 var color = proxy.Config["Minimap/Visual/Indicators/Armies/Color"].color.ToUnityColor();
                 foreach (var obj in Armies)
                 {
