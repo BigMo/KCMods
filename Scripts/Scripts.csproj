@@ -262,6 +262,8 @@
   <ItemGroup>
     <Compile Include="Minimap\Loader.cs" />
     <Compile Include="Minimap\Minimap.cs" />
+    <Compile Include="Minimap\UnitIndicator.cs" />
+    <Compile Include="Minimap\UnitIndicatorPool.cs" />
     <Compile Include="ModMenu\DummyMod.cs" />
     <Compile Include="ModMenu\Loader.cs" />
     <Compile Include="ModMenu\SettingsManager.cs" />

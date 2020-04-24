@@ -667,6 +667,21 @@ namespace Zat.Shared.ModMenu.API
         {
             return !Equals(other);
         }
+
+        public UnityEngine.Color ToUnityColor()
+        {
+            return new UnityEngine.Color(r, g, b, a);
+        }
+        public static Color FromUnityColor(UnityEngine.Color color)
+        {
+            return new Color()
+            {
+                r = color.r,
+                g = color.g,
+                b = color.b,
+                a = color.a
+            };
+        }
     }
     public class Hotkey : IEquatable<Hotkey>, Copyable<Hotkey>, Updatable<Hotkey>
     {
