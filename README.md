@@ -9,7 +9,7 @@ So far this project implements the following frameworks:
 -   _Zat.InterModComm_: Provides functionality to perform remote procedure calls (RPC) between multiple mods. You can use this to perform calls and bind events between mods.
 -   _Zat.ModMenu.API_: An API you can use in your own mod projects to interact with the mod menu. You can define settings and categories, subscribe to changes and update UI elements programmatically.
 
-Please refer to the [wiki](https://github.com/BigMo/KCMods/wiki) on how to use these frameworks.
+Please refer to the [wiki](https://github.com/LionShield/Kingdoms-and-Castles-Toolkit/wiki) on how to use these frameworks.
 
 ## Scripts
 
@@ -22,7 +22,7 @@ In order to set this repo up on your machine, follow these steps:
 1. Clone or download the respository
 2. Copy all Libraries (`*.dll` files) from the folder games' folder `Kingdoms and Castles\KingdomsAndCastles_Data\Managed` into the folder `Scripts\GameData`. This way Visual Studio will detect all references to the game's code and libraries.
 
-_> Note: If all you wish to do is interface with the mod menu, please read the [wiki article](https://github.com/BigMo/KCMods/wiki/Zat.ModMenu.API) instead!_
+_> Note: If all you wish to do is interface with the mod menu, please read the [wiki article](https://github.com/LionShield/Kingdoms-and-Castles-Toolkit/wiki/2.2-%7C-ModMenu-by-Zat) instead!_
 
 ### Create your own Mod
 
