@@ -18,6 +18,7 @@ using TMPro;
 using Button = UnityEngine.UI.Button;
 using UnityEngine.EventSystems;
 using Zat.Shared.UI.Utilities;
+using Zat.Shared.ModMenu.Interactive;
 
 namespace Zat.Minimap
 {
@@ -116,7 +117,8 @@ namespace Zat.Minimap
 
         private UnitIndicatorPool pool = new UnitIndicatorPool();
 
-        private KeyCode ToggleKey { get { return (KeyCode?)proxy?.Config["Minimap/Key"]?.hotkey.keyCode ?? KeyCode.M; } }
+        private MinimapSettings settings;
+
         public void Start()
         {
             try
@@ -161,37 +163,14 @@ namespace Zat.Minimap
                 SetPos(0, 0);
                 mapImage.texture = tex;
 
-                ModSettingsBootstrapper.Register(ModConfigBuilder
-                    .Create("Minimap", "v1.3", "Zat")
-                    //General
-                    .AddToggle("Minimap/Enabled", "Whether or not to show the map", "Visible", true)
-                    .AddHotkey("Minimap/Key", "What button to press to toggle the map on/off\nSet to [M]", (int)KeyCode.M)
-                    .AddSlider("Minimap/Update Interval", "Interval between minimap updates", "Every 5.00s", 1, 30, true, 5)
+                var config = new InteractiveConfiguration<MinimapSettings>();
+                settings = config.Settings;
 
-                    //Visual
-                    .AddSlider("Minimap/Visual/Size", "Width and height of the map in pixels", "Size: 128px", 100, 1024, true, 128)
-                    .AddSlider("Minimap/Visual/Position X", "Where the map is placed horizontally", "X: 0", 0, Screen.width, true, 0)
-                    .AddSlider("Minimap/Visual/Position Y", "Where the map is placed vertically", "Y: 0", 0, Screen.height, true, 0)
-
-                    //Visual Indicators Camera
-                    .AddToggle("Minimap/Visual/Indicators/Camera/Enabled", "Show/hide the camera indicator (arrow)", "Visible", true)
-                    .AddColor("Minimap/Visual/Indicators/Camera/Color", "The color of the camera indicator", 0, 0, 0, 0.7f)
-                    .AddSlider("Minimap/Visual/Indicators/Camera/Size", "The size of the camera indicator", "Size: 16px", 4, 64, true, 16)
-                    //Visual Indicators Army
-                    .AddToggle("Minimap/Visual/Indicators/Armies/Enabled", "Show/hide armies as indicators", "Visible", true)
-                    .AddColor("Minimap/Visual/Indicators/Armies/Color", "The color of the army indicators", 0, 0.88f, 1f, 0.9f)
-                    .AddSlider("Minimap/Visual/Indicators/Armies/Size", "The size of the army indicators", "Size: 16px", 4, 64, true, 32)
-                    //Visual Indicators Vikings
-                    .AddToggle("Minimap/Visual/Indicators/Vikings/Enabled", "Show/hide vikings as indicators", "Visible", true)
-                    .AddColor("Minimap/Visual/Indicators/Vikings/Color", "The color of the viking indicators", 1, 0.28f, 0, 0.9f)
-                    .AddSlider("Minimap/Visual/Indicators/Vikings/Size", "The size of the viking indicators", "Size: 16px", 4, 64, true, 48)
-                    //Visual Indicators Dragons
-                    .AddToggle("Minimap/Visual/Indicators/Dragons/Enabled", "Show/hide dragons as indicators", "Visible", true)
-                    .AddColor("Minimap/Visual/Indicators/Dragons/Color", "The color of the dragon indicators", 1, 0, 0, 0.9f)
-                    .AddSlider("Minimap/Visual/Indicators/Dragons/Size", "The size of the dragon indicators", "Size: 16px", 4, 64, true, 48)
-
-                    .Build(),
-                    OnModRegistered, (ex) => { });
+                ModSettingsBootstrapper.Register(config.ModConfig, OnModRegistered, (ex) =>
+                {
+                    Loader.Helper.Log($"Failed to register mod: {ex.Message}");
+                    Loader.Helper.Log(ex.StackTrace);
+                });
             }
             catch (Exception ex)
             {
@@ -206,7 +185,7 @@ namespace Zat.Minimap
             var point = new Vector2();
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(mapImage.gameObject.GetComponent<RectTransform>(), pointerData.position, pointerData.pressEventCamera, out point))
             {
-                var perc = (point / (proxy?.Config["Minimap/Visual/Size"]?.slider?.value ?? 1)) + Vector2.one * 0.5f;
+                var perc = (point / settings.Visual.Size.Value) + Vector2.one * 0.5f;
                 var target = perc * WorldSize;
                 //Cam.inst?.BringIntoView(new Vector3(target.x, 0, target.y), new ArrayExt<Vector3>(1));
                 Cam.inst?.SetDesiredTrackingPos(new Vector3(target.x, 0, target.y)); //<- Doesn't work but instead warps the camera around the map
@@ -228,13 +207,9 @@ namespace Zat.Minimap
         private void OnMoved()
         {
             if (!proxy) return;
-            var posx = proxy.Config["Minimap/Visual/Position X"];
-            var posy = proxy.Config["Minimap/Visual/Position Y"];
             var rect = mapUI.GetComponent<RectTransform>();
-            posx.slider.value = rect.anchoredPosition.x;
-            posy.slider.value = -rect.anchoredPosition.y;
-            proxy.UpdateSetting(posx, null, null);
-            proxy.UpdateSetting(posy, null, null);
+            settings.Visual.PositionX.Value = rect.anchoredPosition.x;
+            settings.Visual.PositionY.Value = -rect.anchoredPosition.y;
         }
 
 
@@ -247,114 +222,66 @@ namespace Zat.Minimap
                 return;
             }
 
-            proxy.AddSettingsChangedListener("Minimap/Visual/Size", (setting) => {
+            settings.Enabled.OnUpdate.AddListener((setting) =>
+            {
+                mapUI.SetActive(settings.Enabled.Value);
+                settings.Enabled.Label = mapUI.activeSelf ? "Visible" : "Hidden";
+            });
+            settings.UpdateInterval.OnUpdate.AddListener((setting) => settings.UpdateInterval.Label = $"Every {(int)setting.slider.value}s");
+            //Visuals
+            settings.Visual.Size.OnUpdate.AddListener((setting) =>
+            {
                 SetSize(setting.slider.value);
-                setting.slider.label = $"Size: {(int)setting.slider.value}px";
-                proxy.UpdateSetting(setting, null, null);
+                settings.Visual.Size.Label = $"Size: {(int)setting.slider.value}px";
             });
-            proxy.AddSettingsChangedListener("Minimap/Key", (setting) => {
-                setting.description = $"What button to press to toggle the map on/off\nSet to {setting.hotkey.ToString()}";
-                proxy.UpdateSetting(setting, null, null);
-            });
-            proxy.AddSettingsChangedListener("Minimap/Update Interval", (setting) => {
-                updateInterval = setting.slider.value;
-                setting.slider.label = $"Every {(int)setting.slider.value}s";
-                proxy.UpdateSetting(setting, null, null);
-            });
-            proxy.AddSettingsChangedListener("Minimap/Enabled", EnabledChanged);
-            proxy.AddSettingsChangedListener("Minimap/Visual/Position X", (setting) =>
+            settings.Visual.PositionX.OnUpdate.AddListener((setting) =>
             {
-                SetPos(setting.slider.value, proxy.Config["Minimap/Visual/Position Y"].slider.value);
-                setting.slider.label = $"X: {setting.slider.value.ToString("0.00")}";
-                proxy.UpdateSetting(setting, null, null);
+                SetPos(setting.slider.value, settings.Visual.PositionY.Value);
+                settings.Visual.PositionX.Label = $"X: {(int)setting.slider.value}";
             });
-            proxy.AddSettingsChangedListener("Minimap/Visual/Position Y", (setting) =>
+            settings.Visual.PositionY.OnUpdate.AddListener((setting) =>
             {
-                SetPos(proxy.Config["Minimap/Visual/Position X"].slider.value, setting.slider.value);
-                setting.slider.label = $"Y: {setting.slider.value.ToString("0.00")}";
-                proxy.UpdateSetting(setting, null, null);
+                SetPos(settings.Visual.PositionX.Value, setting.slider.value);
+                settings.Visual.PositionY.Label = $"Y: {(int)setting.slider.value}";
             });
-            proxy.AddResetIssuedListener(()=> { /* Implement Update-calls that restore default values */ });
-
-            //Indicators Camera
-            proxy.AddSettingsChangedListener("Minimap/Visual/Indicators/Camera/Enabled", (setting) =>
+            //Camera
+            settings.Visual.Indicators.Camera.Enabled.OnUpdate.AddListener((setting) =>
             {
                 arrowBody.gameObject.SetActive(setting.toggle.value);
-                setting.toggle.label = setting.toggle.value ? "Visible" : "Hidden";
-                proxy.UpdateSetting(setting, null, null);
             });
-            proxy.AddSettingsChangedListener("Minimap/Visual/Indicators/Camera/Color", (setting) => {
-                arrowImage.color = new Color(setting.color.r, setting.color.g, setting.color.b, setting.color.a);
-            });
-            proxy.AddSettingsChangedListener("Minimap/Visual/Indicators/Camera/Size", (setting) => {
-                setting.slider.label = $"Size: {(int)setting.slider.value}px";
+            settings.Visual.Indicators.Camera.Color.OnUpdate.AddListener((setting) => arrowImage.color = setting.color.ToUnityColor() );
+            settings.Visual.Indicators.Camera.Size.OnUpdate.AddListener((setting) =>
+            {
                 arrowImageBody.sizeDelta = new Vector2(setting.slider.value, setting.slider.value);
-                proxy.UpdateSetting(setting, null, null);
-            });
-            //Indicators Army
-            proxy.AddSettingsChangedListener("Minimap/Visual/Indicators/Armies/Enabled", (setting) =>
-            {
-                setting.toggle.label = setting.toggle.value ? "Visible" : "Hidden";
-                proxy.UpdateSetting(setting, null, null);
-            });
-            proxy.AddSettingsChangedListener("Minimap/Visual/Indicators/Armies/Size", (setting) => {
-                setting.slider.label = $"Size: {(int)setting.slider.value}px";
-                proxy.UpdateSetting(setting, null, null);
-            });
-            //Indicators Vikings
-            proxy.AddSettingsChangedListener("Minimap/Visual/Indicators/Vikings/Enabled", (setting) =>
-            {
-                setting.toggle.label = setting.toggle.value ? "Visible" : "Hidden";
-                proxy.UpdateSetting(setting, null, null);
-            });
-            proxy.AddSettingsChangedListener("Minimap/Visual/Indicators/Vikings/Size", (setting) => {
-                setting.slider.label = $"Size: {(int)setting.slider.value}px";
-                proxy.UpdateSetting(setting, null, null);
-            });
-            //Indicators Army
-            proxy.AddSettingsChangedListener("Minimap/Visual/Indicators/Dragons/Enabled", (setting) =>
-            {
-                setting.toggle.label = setting.toggle.value ? "Visible" : "Hidden";
-                proxy.UpdateSetting(setting, null, null);
-            });
-            proxy.AddSettingsChangedListener("Minimap/Visual/Indicators/Dragons/Size", (setting) => {
-                setting.slider.label = $"Size: {(int)setting.slider.value}px";
-                proxy.UpdateSetting(setting, null, null);
             });
 
-            //Apply saved values
-            foreach (var setting in saved)
-            {
-                var own = proxy.Config[setting.path];
-                if (own != null)
-                {
-                    own.CopyFrom(setting);
-                    proxy.UpdateSetting(own, null, null);
-                }
-            }
-            SetSize(proxy.Config["Minimap/Visual/Size"].slider.value);
+            //Indicators
+            SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Camera);
+            SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Armies);
+            SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Dragons);
+            SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Vikings);
+
+            SetSize(settings.Visual.Size.Value);
             SetPos(
-                proxy.Config["Minimap/Visual/Position X"].slider.value,
-                proxy.Config["Minimap/Visual/Position Y"].slider.value
+                settings.Visual.PositionX.Value,
+                settings.Visual.PositionY.Value
             );
         }
 
-        private void EnabledChanged(SettingsEntry setting)
+        private void SetupResponsiveIndicatorEntry(IndicatorEntry entry)
         {
-            mapUI.SetActive(setting.toggle.value);
-            setting.toggle.label = mapUI.activeSelf ? "Visible" : "Hidden";
-            proxy.UpdateSetting(setting, null, null);
+            entry.Enabled.OnUpdate.AddListener((setting) => entry.Enabled.Label = setting.toggle.value ? "Visible" : "Hidden");
+            entry.Size.OnUpdate.AddListener((setting) => entry.Size.Label = $"Size: {(int)setting.slider.value}px" );
         }
 
         private void Update()
         {
             if (Time.time > nextUpdate)
                 UpdateMap();
-            if (Input.GetKeyDown(ToggleKey))
+            if (settings == null) return;
+            if (Input.GetKeyDown(settings.Key.Key))
             {
-                var setting = proxy.Config["Minimap/Enabled"];
-                setting.toggle.value = !setting.toggle.value;
-                EnabledChanged(setting);
+                settings.Enabled.Value = !settings.Enabled.Value;
             }
             UpdateArrow();
             try
@@ -368,72 +295,32 @@ namespace Zat.Minimap
                     Loader.Helper.Log(ex.StackTrace);
                 }
             }
-
-            if (Input.GetKey(KeyCode.I))
-            {
-                Loader.Helper.Log($"Armies: {Armies.Count()}");
-                Loader.Helper.Log($"Dragons: {Dragons.Count()}");
-                Loader.Helper.Log($"Vikings: {VikingBoats.Count()}");
-                Loader.Helper.Log($"Indicators: {pool.Indicators}");
-                if (Armies.Any())
-                {
-                    var worldSize = WorldSize;
-                    var mapSize = proxy?.Config["Minimap/Visual/Size"]?.slider.value ?? 128;
-                    var pos = Armies.First();
-                    var mPos = ProjectToMap(new Vector2(pos.x, pos.z), worldSize, mapSize);
-                    Loader.Helper.Log($"Army #1 W: {pos.ToString()}");
-                    Loader.Helper.Log($"Army #1 M: {mPos.ToString()}");
-                }
-            }
         }
 
         private void UpdateIndicators()
         {
             pool.Start();
-
             var worldSize = WorldSize;
-            var mapSize = proxy?.Config["Minimap/Visual/Size"]?.slider.value ?? 128;
-
-            if (proxy?.Config["Minimap/Visual/Indicators/Vikings/Enabled"].toggle.value ?? false)
-            {
-                var size = new Vector2(proxy.Config["Minimap/Visual/Indicators/Vikings/Size"].slider.value, proxy.Config["Minimap/Visual/Indicators/Vikings/Size"].slider.value);
-                var color = proxy.Config["Minimap/Visual/Indicators/Vikings/Color"].color.ToUnityColor();
-                foreach (var obj in Vikings)
-                {
-                    var indicator = pool.GetNextIndicator();
-                    if (!indicator) continue;
-                    indicator.Color = color;
-                    indicator.Size = size;
-                    indicator.Position = ProjectToMap(new Vector2(obj.x, obj.z), worldSize, mapSize);
-                }
-            }
-            if (proxy?.Config["Minimap/Visual/Indicators/Dragons/Enabled"].toggle.value ?? false)
-            {
-                var size = new Vector2(proxy.Config["Minimap/Visual/Indicators/Dragons/Size"].slider.value, proxy.Config["Minimap/Visual/Indicators/Dragons/Size"].slider.value);
-                var color = proxy.Config["Minimap/Visual/Indicators/Dragons/Color"].color.ToUnityColor();
-                foreach (var obj in Dragons)
-                {
-                    var indicator = pool.GetNextIndicator();
-                    if (!indicator) continue;
-                    indicator.Color = color;
-                    indicator.Size = size;
-                    indicator.Position = ProjectToMap(new Vector2(obj.x, obj.z), worldSize, mapSize);
-                }
-            }
-            if (proxy?.Config["Minimap/Visual/Indicators/Armies/Enabled"].toggle.value ?? false)
-            {
-                var size = new Vector2(proxy.Config["Minimap/Visual/Indicators/Armies/Size"].slider.value, proxy.Config["Minimap/Visual/Indicators/Armies/Size"].slider.value);
-                var color = proxy.Config["Minimap/Visual/Indicators/Armies/Color"].color.ToUnityColor();
-                foreach (var obj in Armies)
-                {
-                    var indicator = pool.GetNextIndicator();
-                    if (!indicator) continue;
-                    indicator.Color = color;
-                    indicator.Size = size;
-                    indicator.Position = ProjectToMap(new Vector2(obj.x, obj.z), worldSize, mapSize);
-                }
-            }
+            DrawIndicators(settings.Visual.Indicators.Vikings, worldSize, Vikings);
+            DrawIndicators(settings.Visual.Indicators.Dragons, worldSize, Dragons);
+            DrawIndicators(settings.Visual.Indicators.Armies, worldSize, Armies);
             pool.End();
+        }
+
+        private void DrawIndicators(IndicatorEntry entry, Vector2 worldSize, IEnumerable<Vector3> positions)
+        {
+            if (!entry.Enabled) return;
+
+            var size = new Vector2(entry.Size, entry.Size);
+            var color = entry.Color.Color.ToUnityColor();
+            foreach (var obj in positions)
+            {
+                var indicator = pool.GetNextIndicator();
+                if (!indicator) continue;
+                indicator.Color = color;
+                indicator.Size = size;
+                indicator.Position = ProjectToMap(new Vector2(obj.x, obj.z), worldSize, settings.Visual.Size.Value);
+            }
         }
 
         public static Vector2 RotateVec(Vector2 v, float degrees)
@@ -464,7 +351,7 @@ namespace Zat.Minimap
 
         private void UpdateArrow()
         {
-            var newPos = (Vector2.one * (proxy?.Config["Minimap/Visual/Size"]?.slider.value ?? 128)) * (Scroll * new Vector2(1,-1));
+            var newPos = (Vector2.one * settings.Visual.Size) * (Scroll * new Vector2(1,-1));
             arrowBody.anchoredPosition = newPos;
             arrowBody.rotation = Quaternion.Euler(0, 0, -CamRotation - 270);
         }

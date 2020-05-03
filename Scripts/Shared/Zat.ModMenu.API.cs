@@ -7,6 +7,8 @@ using TMPro;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using Zat.Shared.InterModComm;
+using System.Reflection;
+using Zat.Shared.ModMenu.API;
 
 namespace Zat.Shared.ModMenu.API
 {
@@ -125,7 +127,7 @@ namespace Zat.Shared.ModMenu.API
                     }
                 );
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 if (retries > 0)
                     StartCoroutine(RegisterOnTarget(config, onRegistered, onError, retries - 1, delay));
@@ -134,7 +136,7 @@ namespace Zat.Shared.ModMenu.API
             }
         }
     }
-    
+
     /// <summary>
     /// The ModMenu API client used to interact with the ModMenu
     /// </summary>
@@ -535,7 +537,7 @@ namespace Zat.Shared.ModMenu.API
         public bool UpdateableFrom(SettingsEntry other)
         {
             if (description != other.description || type != other.type) return true;
-            switch(type)
+            switch (type)
             {
                 case EntryType.Button:
                     if (button != null) return button.UpdateableFrom(other.button);
@@ -588,6 +590,11 @@ namespace Zat.Shared.ModMenu.API
         {
             return label != other.label;
         }
+
+        public override string ToString()
+        {
+            return $"[Button] label: \"{label}\"";
+        }
     }
     public class Slider : Copyable<Slider>, Updatable<Slider>
     {
@@ -608,6 +615,11 @@ namespace Zat.Shared.ModMenu.API
         {
             return min != other.min || max != other.max || value != other.value || wholeNumbers != other.wholeNumbers || label != other.label;
         }
+
+        public override string ToString()
+        {
+            return $"[Slider] min: {min.ToString("0.00")}, max: {max.ToString("0.00")}, value: {value.ToString("0.00")}, wholeNumbers: {wholeNumbers}, label: \"{label}\"";
+        }
     }
     public class Select : Copyable<Select>, Updatable<Select>
     {
@@ -624,6 +636,11 @@ namespace Zat.Shared.ModMenu.API
         {
             return value != other.value || !options.SequenceEqual(other.options);
         }
+
+        public override string ToString()
+        {
+            return $"[Select] value: {value.ToString()}, options: {{{string.Join(", ", options.Select(o => $"\"{o}\"").ToArray())}}}";
+        }
     }
     public class Toggle : Copyable<Toggle>, Updatable<Toggle>
     {
@@ -639,6 +656,11 @@ namespace Zat.Shared.ModMenu.API
         public bool UpdateableFrom(Toggle other)
         {
             return value != other.value || label != other.label;
+        }
+
+        public override string ToString()
+        {
+            return $"[Toggle] value: {value.ToString()}, label: \"{label}\"";
         }
     }
     public class Color : IEquatable<Color>, Copyable<Color>, Updatable<Color>
@@ -731,4 +753,636 @@ namespace Zat.Shared.ModMenu.API
         Hotkey = 5
     }
     #endregion
+
 }
+namespace Zat.Shared.ModMenu.Interactive
+{
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ModAttribute : Attribute
+    {
+        public string Name { get; private set; }
+        public string Version { get; private set; }
+        public string Author { get; private set; }
+        public ModAttribute(string name, string version, string author)
+        {
+            Name = name;
+            Version = version;
+            Author = author;
+        }
+    }
+    [AttributeUsage(AttributeTargets.Property)]
+    public class CategoryAttribute : Attribute
+    {
+        public string Name { get; private set; }
+        public CategoryAttribute(string name)
+        {
+            if (name.Contains("/")) throw new ArgumentException("Category name must not contains a \"/\"!");
+            Name = name;
+        }
+    }
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class SettingAttribute : Attribute
+    {
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+
+        public SettingAttribute(string name, string description = "")
+        {
+            Name = name;
+            Description = description;
+        }
+    }
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class SpecificSettingAttribute : Attribute { }
+    public abstract class InteractiveSetting
+    {
+        public string Name
+        {
+            get { return Setting.GetName(); }
+            set
+            {
+                if (Setting.GetName() == value) return;
+                Setting.path = string.Join("/", Setting.GetCategoryPath().Concat(new string[] { value }));
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public string Description
+        {
+            get { return Setting.description; }
+            set
+            {
+                if (Setting.description == value) return;
+                Setting.description = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public string Path { get { return Setting.path; } }
+        public abstract EntryType Type { get; }
+
+        /// <summary>
+        /// Invoked when a setting is updated programmatically via the mod itself
+        /// </summary>
+        public SettingsChangedEvent OnLocalUpdate { get; private set; }
+        /// <summary>
+        /// Invoked when a setting is updated by the UI and sent to the mod
+        /// </summary>
+        public SettingsChangedEvent OnUpdatedRemotely { get; private set; }
+        /// <summary>
+        /// Invoked when a setting is updated
+        /// </summary>
+        public SettingsChangedEvent OnUpdate { get; private set; }
+
+        protected SettingsEntry Setting { get; private set; }
+
+        protected InteractiveSetting(SettingsEntry entry)
+        {
+            Setting = entry;
+            OnLocalUpdate = new SettingsChangedEvent();
+            OnUpdatedRemotely = new SettingsChangedEvent();
+            OnUpdate = new SettingsChangedEvent();
+
+            OnLocalUpdate.AddListener((setting) => OnUpdate?.Invoke(setting));
+            OnUpdatedRemotely.AddListener((setting) => OnUpdate?.Invoke(setting));
+        }
+
+        public abstract void UpdateFromRemote(SettingsEntry entry);
+        public abstract void Reset();
+    }
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class SliderAttribute : SpecificSettingAttribute
+    {
+        public float Min { get; private set; }
+        public float Max { get; private set; }
+        public float Value { get; private set; }
+        public bool WholeNumbers { get; private set; }
+        public string Label { get; private set; }
+        public SliderAttribute(float min, float max, float value, string label = "", bool wholeNumbers = false)
+        {
+            Min = min;
+            Max = max;
+            Value = value;
+            WholeNumbers = wholeNumbers;
+            Label = label;
+        }
+    }
+    public class InteractiveSliderSetting : InteractiveSetting
+    {
+        public float Min
+        {
+            get { return Setting.slider.min; }
+            set
+            {
+                if (Setting.slider.min == value) return;
+                Setting.slider.min = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public float Max
+        {
+            get { return Setting.slider.max; }
+            set
+            {
+                if (Setting.slider.max == value) return;
+                Setting.slider.max = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public float Value
+        {
+            get { return Setting.slider.value; }
+            set
+            {
+                if (Setting.slider.value == value) return;
+                Setting.slider.value = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public string Label
+        {
+            get { return Setting.slider.label; }
+            set
+            {
+                if (Setting.slider.label == value) return;
+                Setting.slider.label = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public bool WholeNumbers
+        {
+            get { return Setting.slider.wholeNumbers; }
+            set
+            {
+                if (Setting.slider.wholeNumbers == value) return;
+                Setting.slider.wholeNumbers = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public override EntryType Type { get { return EntryType.Slider; } }
+        private SliderAttribute defaultValues;
+        public InteractiveSliderSetting(SettingsEntry entry, SliderAttribute values) : base(entry)
+        {
+            defaultValues = values;
+            entry.slider = new API.Slider()
+            {
+                max = values.Max,
+                min = values.Min,
+                value = values.Value,
+                wholeNumbers = values.WholeNumbers,
+                label = values.Label
+            };
+            entry.type = EntryType.Slider;
+        }
+
+        public static implicit operator float(InteractiveSliderSetting slider)
+        {
+            return slider.Value;
+        }
+
+        public override void UpdateFromRemote(SettingsEntry entry)
+        {
+            Setting.slider.CopyFrom(entry.slider);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+
+        public override void Reset()
+        {
+            var slider = new API.Slider()
+            {
+                max = defaultValues.Max,
+                min = defaultValues.Min,
+                value = defaultValues.Value,
+                wholeNumbers = defaultValues.WholeNumbers,
+                label = defaultValues.Label
+            };
+            if (!Setting.slider.UpdateableFrom(slider)) return;
+            Setting.slider.CopyFrom(slider);
+            OnLocalUpdate?.Invoke(Setting);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+    }
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class ToggleAttribute : SpecificSettingAttribute
+    {
+        public bool Value { get; private set; }
+        public string Label { get; private set; }
+        public ToggleAttribute(bool value, string label = "")
+        {
+            Value = value;
+            Label = label;
+        }
+    }
+    public class InteractiveToggleSetting : InteractiveSetting
+    {
+        public bool Value
+        {
+            get { return Setting.toggle.value; }
+            set
+            {
+                if (Setting.toggle.value == value) return;
+                Setting.toggle.value = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public string Label
+        {
+            get { return Setting.toggle.label; }
+            set
+            {
+                if (Setting.toggle.label == value) return;
+                Setting.toggle.label = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        private ToggleAttribute defaultValues;
+        public InteractiveToggleSetting(SettingsEntry entry, ToggleAttribute values) : base(entry)
+        {
+            defaultValues = values;
+            entry.type = EntryType.Toggle;
+            entry.toggle = new API.Toggle()
+            {
+                value = values.Value,
+                label = values.Label
+            };
+        }
+
+        public override EntryType Type { get { return EntryType.Toggle; } }
+
+        public static implicit operator bool(InteractiveToggleSetting toggle)
+        {
+            return toggle.Value;
+        }
+
+        public override void UpdateFromRemote(SettingsEntry entry)
+        {
+            Setting.toggle.CopyFrom(entry.toggle);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+
+        public override void Reset()
+        {
+            var toggle = new API.Toggle()
+            {
+                value = defaultValues.Value,
+                label = defaultValues.Label
+            };
+            if (!Setting.toggle.UpdateableFrom(toggle)) return;
+            Setting.toggle.CopyFrom(toggle);
+            OnLocalUpdate?.Invoke(Setting);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+    }
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class SelectAttribute : SpecificSettingAttribute
+    {
+        public string[] Options { get; private set; }
+        public int Value { get; private set; }
+
+        public SelectAttribute(int value, params string[] options)
+        {
+            Options = options;
+            Value = value;
+        }
+    }
+    public class InteractiveSelectSetting : InteractiveSetting
+    {
+        public string[] Options
+        {
+            get { return Setting.select.options; }
+            set
+            {
+                if (Setting.select.options.SequenceEqual(value)) return;
+                Setting.select.options = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public int Value
+        {
+            get { return Setting.select.value; }
+            set
+            {
+                if (Setting.select.value == value) return;
+                Setting.select.value = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        private SelectAttribute defaultValues;
+        public InteractiveSelectSetting(SettingsEntry entry, SelectAttribute values) : base(entry)
+        {
+            defaultValues = values;
+            entry.type = EntryType.Select;
+            entry.select = new Select()
+            {
+                options = values.Options,
+                value = values.Value
+            };
+        }
+
+        public override EntryType Type { get { return EntryType.Select; } }
+
+        public static implicit operator int(InteractiveSelectSetting select)
+        {
+            return select.Value;
+        }
+
+        public override void UpdateFromRemote(SettingsEntry entry)
+        {
+            Setting.select.CopyFrom(entry.select);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+
+        public override void Reset()
+        {
+            var select = new Select()
+            {
+                options = defaultValues.Options,
+                value = defaultValues.Value
+            };
+            if (!Setting.select.UpdateableFrom(select)) return;
+            Setting.select.CopyFrom(select);
+            OnLocalUpdate?.Invoke(Setting);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+    }
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class ColorAttribute : SpecificSettingAttribute
+    {
+        public float A { get; private set; }
+        public float R { get; private set; }
+        public float G { get; private set; }
+        public float B { get; private set; }
+
+        public ColorAttribute(float r, float g, float b, float a = 1f)
+        {
+            A = a;
+            R = r;
+            G = g;
+            B = b;
+        }
+    }
+    public class InteractiveColorSetting : InteractiveSetting
+    {
+        public API.Color Color
+        {
+            get { return Setting.color; }
+            set
+            {
+                if (!Setting.color.UpdateableFrom(value)) return;
+                Setting.color = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        private ColorAttribute defaultValues;
+        public InteractiveColorSetting(SettingsEntry entry, ColorAttribute values) : base(entry)
+        {
+            defaultValues = values;
+            entry.type = EntryType.Color;
+            entry.color = new API.Color()
+            {
+                a = values.A,
+                r = values.R,
+                g = values.G,
+                b = values.B
+            };
+        }
+
+        public override EntryType Type { get { return EntryType.Color; } }
+
+        public static implicit operator API.Color(InteractiveColorSetting color)
+        {
+            return color.Color;
+        }
+
+        public override void UpdateFromRemote(SettingsEntry entry)
+        {
+            Setting.color.CopyFrom(entry.color);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+        public override void Reset()
+        {
+            var color = new API.Color()
+            {
+                a = defaultValues.A,
+                r = defaultValues.R,
+                g = defaultValues.G,
+                b = defaultValues.B
+            };
+            if (!Setting.color.UpdateableFrom(color)) return;
+            Setting.color.CopyFrom(color);
+            OnLocalUpdate?.Invoke(Setting);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+    }
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class HotkeyAttribute : SpecificSettingAttribute
+    {
+        public bool Ctrl { get; private set; }
+        public bool Alt { get; private set; }
+        public bool Shift { get; private set; }
+        public KeyCode Key { get; private set; }
+
+        public HotkeyAttribute(KeyCode key, bool ctrl = false, bool alt = false, bool shift = false)
+        {
+            Key = key;
+            Ctrl = ctrl;
+            Alt = alt;
+            Shift = shift;
+        }
+    }
+    public class InteractiveHotkeySetting : InteractiveSetting, Copyable<Hotkey>
+    {
+        public KeyCode Key
+        {
+            get { return (KeyCode)Setting.hotkey.keyCode; }
+            set
+            {
+                if (Setting.hotkey.keyCode == (int)value) return;
+                Setting.hotkey.keyCode = (int)value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public bool Ctrl
+        {
+            get { return Setting.hotkey.ctrl; }
+            set
+            {
+                if (Setting.hotkey.ctrl == value) return;
+                Setting.hotkey.ctrl = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public bool Alt
+        {
+            get { return Setting.hotkey.alt; }
+            set
+            {
+                if (Setting.hotkey.alt == value) return;
+                Setting.hotkey.alt = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        public bool Shift
+        {
+            get { return Setting.hotkey.shift; }
+            set
+            {
+                if (Setting.hotkey.shift == value) return;
+                Setting.hotkey.shift = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+        private HotkeyAttribute defaultValues;
+        public InteractiveHotkeySetting(SettingsEntry entry, HotkeyAttribute values) : base(entry)
+        {
+            defaultValues = values;
+            entry.type = EntryType.Hotkey;
+            entry.hotkey = new Hotkey()
+            {
+                keyCode = (int)values.Key,
+                ctrl = values.Ctrl,
+                alt = values.Alt,
+                shift = values.Shift
+            };
+        }
+
+        public override EntryType Type { get { return EntryType.Hotkey; } }
+
+        public void CopyFrom(Hotkey other)
+        {
+            if (!Setting.hotkey.UpdateableFrom(other)) return;
+            Setting.hotkey.CopyFrom(other);
+        }
+
+        public override void UpdateFromRemote(SettingsEntry entry)
+        {
+            Setting.hotkey.CopyFrom(entry.hotkey);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+        public override void Reset()
+        {
+            var hotkey = new Hotkey()
+            {
+                keyCode = (int)defaultValues.Key,
+                ctrl = defaultValues.Ctrl,
+                alt = defaultValues.Alt,
+                shift = defaultValues.Shift
+            };
+            if (!Setting.hotkey.UpdateableFrom(hotkey)) return;
+            Setting.hotkey.CopyFrom(hotkey);
+            OnLocalUpdate?.Invoke(Setting);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+    }
+
+    public class InteractiveConfiguration<T> where T : class, new()
+    {
+        public static KCModHelper Helper { get; set; }
+        public T Settings { get; private set; }
+        public ModConfig ModConfig { get; private set; }
+        private List<InteractiveSetting> interactiveSettings;
+
+        public InteractiveConfiguration()
+        {
+            Parse();
+        }
+
+        public void Install(ModSettingsProxy proxy, SettingsEntry[] oldSettings)
+        {
+            foreach (var setting in interactiveSettings)
+            {
+                if (Helper != null) Helper.Log($"Registering listeners for {setting.Path}");
+                proxy.AddSettingsChangedListener(setting.Path, (entry) =>
+                {
+                    if (Helper != null) Helper.Log($"{entry.path} was updated [{setting.GetType().Name}]");
+                    setting.UpdateFromRemote(entry);
+                });
+                setting.OnLocalUpdate.AddListener((entry) => proxy.UpdateSetting(entry, null, null));
+            }
+
+            proxy.AddResetIssuedListener(() =>
+            {
+                foreach (var setting in interactiveSettings)
+                    setting.Reset();
+            });
+
+            foreach (var setting in oldSettings)
+            {
+                var currentSetting = interactiveSettings.Where(s => s.Path == setting.path).FirstOrDefault();
+                if (currentSetting == null) continue;
+                currentSetting.UpdateFromRemote(setting);
+            }
+        }
+        private void Parse()
+        {
+            var type = typeof(T);
+            var obj = Activator.CreateInstance(type);
+            var mod = type.GetCustomAttributes(typeof(ModAttribute), false).Cast<ModAttribute>().FirstOrDefault();
+            var modSettings = new List<SettingsEntry>();
+            interactiveSettings = new List<InteractiveSetting>();
+
+            DissectObject(mod.Name, obj, modSettings);
+
+            ModConfig = new ModConfig()
+            {
+                name = mod.Name,
+                version = mod.Version,
+                author = mod.Author,
+                settings = modSettings.ToArray()
+            };
+            Settings = obj as T;
+        }
+
+        private void DissectObject(string categoryPath, object obj, List<SettingsEntry> modSettings)
+        {
+            var type = obj.GetType();
+
+            var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var categories = props
+                .Where(p => p.PropertyType.GetConstructor(Type.EmptyTypes) != null)
+                .Select(p => new Tuple<PropertyInfo, CategoryAttribute>(p, p.GetCustomAttributes(typeof(CategoryAttribute), false).Cast<CategoryAttribute>().FirstOrDefault()))
+                .Where(t => t.Item2 != null);
+            var settings = props
+                .Where(p => p.PropertyType.IsSubclassOf(typeof(InteractiveSetting)))
+                .Select(p => new Tuple<PropertyInfo, SettingAttribute, SpecificSettingAttribute>(
+                    p,
+                    p.GetCustomAttributes(typeof(SettingAttribute), false).Cast<SettingAttribute>().FirstOrDefault(),
+                    p.GetCustomAttributes(typeof(SpecificSettingAttribute), false).Cast<SpecificSettingAttribute>().FirstOrDefault()))
+                .Where(t => t.Item2 != null);
+
+            //First, populate categories
+            foreach (var category in categories)
+            {
+                var value = Activator.CreateInstance(category.Item1.PropertyType);
+                category.Item1.SetValue(obj, value, null);
+                DissectObject(
+                    string.Join("/", new string[] { categoryPath, category.Item2.Name }),
+                    value,
+                    modSettings
+                );
+            }
+            //Then, initialize & setup settings...
+            foreach (var setting in settings)
+            {
+                var entry = new SettingsEntry()
+                {
+                    description = setting.Item2.Description,
+                    path = string.Join("/", new string[] { categoryPath, setting.Item2.Name })
+                };
+                if (modSettings.Any(s => s.path == entry.path))
+                {
+                    if (Helper != null) Helper.Log($"Failed to initialize interactive setting of \"{entry.path}\": already registered");
+                    continue;
+                }
+                modSettings.Add(entry);
+                var interactiveSetting = Activator.CreateInstance(setting.Item1.PropertyType, entry, setting.Item3) as InteractiveSetting;
+                if (interactiveSetting == null)
+                {
+                    if (Helper != null) Helper.Log($"Failed to initialize interactive setting of \"{entry.path}\": Activator returned NULL");
+                    continue;
+                }
+                interactiveSettings.Add(interactiveSetting);
+                setting.Item1.SetValue(obj, interactiveSetting, null);
+            }
+        }
+    }
+}
+
