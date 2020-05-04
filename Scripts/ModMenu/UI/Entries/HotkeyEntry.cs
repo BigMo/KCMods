@@ -30,7 +30,7 @@ namespace Zat.ModMenu.UI.Entries
         {
             get { return hotkey; }
             set {
-                if (hotkey != value)
+                //if (hotkey == null || hotkey.UpdateableFrom(value))
                 {
                     hotkey = value;
                     recordKeys = false;
@@ -90,6 +90,9 @@ namespace Zat.ModMenu.UI.Entries
                             case KeyCode.None:
                             case KeyCode.Escape:
                                 recordKeys = false;
+                                break;
+                            case KeyCode.Mouse0:
+                                //Ignore
                                 break;
                             default:
                                 hotkey.keyCode = (int)key;

@@ -22,22 +22,17 @@ namespace Zat.ModMenu.UI.Handlers
             return button;
         }
 
-        private void SetRecording(SettingsEntry setting, HotkeyEntry control, bool recording)
-        {
-            control.recordKeys = true;
-        }
-
         public void UpdateEntry(SettingsEntry data, BaseEntry control)
         {
-            var button = control as HotkeyEntry;
-            if (button == null) throw new Exception($"Entry invalid or null");
-            AssignValue(button, data);
+            var hotKey = control as HotkeyEntry;
+            if (hotKey == null) throw new Exception($"Entry invalid or null");
+            AssignValue(hotKey, data);
         }
-        private void AssignValue(HotkeyEntry button, SettingsEntry data)
+        private void AssignValue(HotkeyEntry hotKey, SettingsEntry data)
         {
-            button.Name = data.GetPathElements()?.Last();
-            button.Description = data.description;
-            button.Hotkey = data.hotkey;
+            hotKey.Name = data.GetPathElements()?.Last();
+            hotKey.Description = data.description;
+            hotKey.Hotkey = data.hotkey;
         }
     }
 }

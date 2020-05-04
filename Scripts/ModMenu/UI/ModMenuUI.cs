@@ -75,7 +75,7 @@ namespace Zat.ModMenu.UI
                 collapseExpand.onClick.AddListener(() => ToggleCollapseExpand());
 
                 if (gameObject.name != ModSettingsNames.Objects.ModMenuName)
-                    Loader.Helper.Log($"{nameof(ModMenuUI)} is attached to \"{gameObject.name}\" instead of \"{ModSettingsNames.Objects.ModMenuName}\"!");
+                    Debugging.Log("ModMenu", $"{nameof(ModMenuUI)} is attached to \"{gameObject.name}\" instead of \"{ModSettingsNames.Objects.ModMenuName}\"!");
 
                 header.alignment = TextAlignmentOptions.Midline;
                 saveText.alignment = TextAlignmentOptions.Midline;
@@ -91,26 +91,24 @@ namespace Zat.ModMenu.UI
                 ui.SetActive(false);
                 SetCollapseExpand(false);
 
-                Loader.Helper.Log($"Started: [{transform.parent?.name ?? "-"}] -> [{transform.name}] -> [{nameof(ModMenuUI)}]");
+                Debugging.Log("ModMenu", $"Started: [{transform.parent?.name ?? "-"}] -> [{transform.name}] -> [{nameof(ModMenuUI)}]");
 
                 var config = new InteractiveConfiguration<ModMenuSettings>();
                 menuSettings = config.Settings;
-                ModSettingsBootstrapper.Register(config.ModConfig, (proxy, saved)=>
-                {
-                    config.Install(proxy, saved);
-                    OnModRegistered(proxy, saved);
-                }, (ex) => { });
+                Debugging.Log("ModMenu", "Registering own meta-mod...");
+                ModSettingsBootstrapper.Register(config.ModConfig,
+                    (proxy, saved) => config.Install(proxy, saved),
+                    (ex) =>
+                    {
+                        Debugging.Log("ModMenu", $"Failed to register meta-mod: {ex.Message}");
+                        Debugging.Log("ModMenu", ex.StackTrace);
+                    });
             }
             catch (Exception ex)
             {
-                Loader.Helper.Log($"Failed to Start {nameof(ModMenuUI)}: {ex.Message}");
-                Loader.Helper.Log(ex.StackTrace);
+                Debugging.Log("ModMenu", $"Failed to Start {nameof(ModMenuUI)}: {ex.Message}");
+                Debugging.Log("ModMenu", ex.StackTrace);
             }
-        }
-
-        private void OnModRegistered(ModSettingsProxy arg0, SettingsEntry[] arg1)
-        {
-
         }
 
         private void ToggleCollapseExpand()
@@ -187,8 +185,8 @@ namespace Zat.ModMenu.UI
             }
             catch(Exception ex)
             {
-                Loader.Helper.Log($"Failed to register mod: {ex}");
-                Loader.Helper.Log(ex.StackTrace);
+                Debugging.Log("ModMenu", $"Failed to register mod: {ex}");
+                Debugging.Log("ModMenu", ex.StackTrace);
                 handler.SendError(port.gameObject.name, ex);
             }
         }
@@ -200,7 +198,7 @@ namespace Zat.ModMenu.UI
                 var associatedMods = settingsManager.GetAssociatedMods(setting).ToArray();
                 if (associatedMods.Length == 0)
                 {
-                    Loader.Helper.Log($"Detected UI update for \"{setting.path}\" but it has no associated mods");
+                    Debugging.Log("ModMenu", $"Detected UI update for \"{setting.path}\" but it has no associated mods");
                     throw new Exception($"Detected UI update for \"{setting.path}\" but it has no associated mods");
                 }
                 foreach (var mod in associatedMods)
@@ -209,26 +207,40 @@ namespace Zat.ModMenu.UI
             catch (Exception ex)
             {
                 var updateEx = new UpdateFailedException(ex.Message);
-                Loader.Helper.Log(ex.Message);
-                Loader.Helper.Log(ex.StackTrace);
+                Debugging.Log("ModMenu", ex.Message);
+                Debugging.Log("ModMenu", ex.StackTrace);
                 throw updateEx;
             }
         }
 
         private void UpdateSettingHandler(IRequestHandler handler, string source, SettingsEntry entry)
         {
-            var context = settingsManager.GetSettingByPath(entry.path);
-            if (context == null)
+            try
             {
-                handler.SendError(port.gameObject.name, $"Entry \"{entry.path}\" not registered!");
-                return;
+                var context = settingsManager.GetSettingByPath(entry.path);
+                if (context == null)
+                {
+                    Debugging.Log("ModMenu", $"Attempted to update unregistered entry \"{entry.path}\"!");
+                    handler.SendError(port.gameObject.name, $"Entry \"{entry.path}\" not registered!");
+                    return;
+                }
+                if (context.Setting.UpdateableFrom(entry))
+                {
+                    context.UpdateSetting(entry);
+                    EntryHandler.Instance.UpdateEntry(context.Setting, context.UIElement);
+                }
+                else
+                {
+                    //Debugging.Log("ModMenu", $"Received update for {entry.path} that provides no new information");
+                }
+                handler.SendResponse(port.gameObject.name);
             }
-            if (context.Setting.UpdateableFrom(entry))
+            catch(Exception ex)
             {
-                context.UpdateSetting(entry);
-                EntryHandler.Instance.UpdateEntry(context.Setting, context.UIElement);
+                Debugging.Log("ModMenu", $"Failed to process update: {ex.Message}");
+                Debugging.Log("ModMenu", ex.StackTrace);
+                handler.SendError(port.gameObject.name, ex);
             }
-            handler.SendResponse(port.gameObject.name);
         }
 
         public class UpdateFailedException : Exception

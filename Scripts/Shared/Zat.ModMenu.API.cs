@@ -720,7 +720,7 @@ namespace Zat.Shared.ModMenu.API
 
         public bool UpdateableFrom(Hotkey other)
         {
-            return !Equals(other);
+            return keyCode != other.keyCode || ctrl != other.ctrl || alt != other.alt || shift != other.shift;
         }
 
         public override string ToString()
@@ -841,6 +841,7 @@ namespace Zat.Shared.ModMenu.Interactive
         public abstract void UpdateFromRemote(SettingsEntry entry);
         public void RestoreSetting(SettingsEntry entry)
         {
+            Debugging.Log("InteractiveSetting", $"Receiving saved setting for: {entry.path}");
             this.UpdateFromRemote(entry);
             OnLocalUpdate?.Invoke(Setting);
         }
@@ -1283,7 +1284,7 @@ namespace Zat.Shared.ModMenu.Interactive
             Label = label;
         }
     }
-    public class InteractiveButton : InteractiveSetting
+    public class InteractiveButtonSetting : InteractiveSetting
     {
         private ButtonAttribute defaultValues;
         private ButtonState previousState;
@@ -1308,7 +1309,7 @@ namespace Zat.Shared.ModMenu.Interactive
         public UnityEvent OnButtonPressed { get; private set; }
         public UnityEvent MouseUp { get; private set; }
 
-        public InteractiveButton(SettingsEntry entry, ButtonAttribute values) : base(entry)
+        public InteractiveButtonSetting(SettingsEntry entry, ButtonAttribute values) : base(entry)
         {
             defaultValues = values;
             entry.type = EntryType.Button;
