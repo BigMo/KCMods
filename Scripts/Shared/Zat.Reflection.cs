@@ -1,15 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System;
-using UnityEngine;
-using TMPro;
-using UnityEngine.Events;
-using UnityEngine.UI;
+﻿using System.Reflection;
 
 namespace Zat.Shared.Reflection
-{ 
+{
     public static class ReflectionExtensions
     {
         private static FieldInfo GetFieldInfo(object obj, string name)

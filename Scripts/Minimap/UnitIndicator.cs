@@ -1,23 +1,5 @@
-﻿using Harmony;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.Events;
-using Newtonsoft.Json;
-using Zat.Shared.ModMenu.API;
-using Color = UnityEngine.Color;
-using Zat.Shared.Rendering;
-using Zat.Shared.Reflection;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using Button = UnityEngine.UI.Button;
-using UnityEngine.EventSystems;
-using Zat.Shared.UI.Utilities;
 
 namespace Zat.Minimap
 {
@@ -32,9 +14,9 @@ namespace Zat.Minimap
             return go.AddComponent<UnitIndicator>();
         }
 
-        public Color Color
+        public UnityEngine.Color Color
         {
-            get { return image?.color ?? Color.white; }
+            get { return image?.color ?? UnityEngine.Color.white; }
             set { if (image) image.color = value; }
         }
         public Vector2 Size

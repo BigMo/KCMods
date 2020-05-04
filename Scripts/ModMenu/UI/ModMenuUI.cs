@@ -1,17 +1,15 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
 using TMPro;
-using UnityEngine.Events;
-using UnityEngine.UI;
 using Zat.Shared.InterModComm;
 using Zat.Shared.ModMenu.API;
 using Zat.ModMenu.UI.Handlers;
 using Zat.ModMenu.UI.Entries;
 using Newtonsoft.Json;
 using Zat.Shared.UI.Utilities;
+using Zat.Shared;
 
 namespace Zat.ModMenu.UI
 {
@@ -42,7 +40,8 @@ namespace Zat.ModMenu.UI
         {
             try
             {
-                IMCPort.helper = Loader.Helper;
+                Debugging.Active = true;
+                Debugging.Helper = Loader.Helper;
                 transform.name = ModSettingsNames.Objects.ModMenuName;
                 header = transform.Find("ModSettingsUI/Header/Text")?.GetComponent<TextMeshProUGUI>();
                 collapseExpand = transform.Find("ModSettingsUI/CollapseExpand")?.GetComponent<UnityEngine.UI.Button>();
@@ -88,7 +87,7 @@ namespace Zat.ModMenu.UI
 
                 savedSettings = LoadSettings();
                 ui.SetActive(false);
-                ToggleCollapseExpand();
+                SetCollapseExpand(false);
 
                 Loader.Helper.Log($"Started: [{transform.parent?.name ?? "-"}] -> [{transform.name}] -> [{nameof(ModMenuUI)}]");
             }
@@ -167,12 +166,14 @@ namespace Zat.ModMenu.UI
                 settings.RegisterMod(source, mod);
                 var _saved = savedSettings != null ? savedSettings.Where(s => mod.settings.Any(m => m.path == s.path)).ToArray() : new SettingsEntry[0];
                 handler.SendResponse(port.gameObject.name, _saved);
-                LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
+                UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
                 if (noMods != null) noMods.SetActive(!settings.Mods.Any());
                 SetCollapseExpand(false);
             }
             catch(Exception ex)
             {
+                Loader.Helper.Log($"Failed to register mod: {ex}");
+                Loader.Helper.Log(ex.StackTrace);
                 handler.SendError(port.gameObject.name, ex);
             }
         }
@@ -183,8 +184,10 @@ namespace Zat.ModMenu.UI
             {
                 var associatedMods = settings.GetAssociatedMods(setting).ToArray();
                 if (associatedMods.Length == 0)
+                {
+                    Loader.Helper.Log($"Detected UI update for \"{setting.path}\" but it has no associated mods");
                     throw new Exception($"Detected UI update for \"{setting.path}\" but it has no associated mods");
-
+                }
                 foreach (var mod in associatedMods)
                     port.RPC(mod.GameObject, ModSettingsNames.Events.SettingChanged, setting, 5f, null, null);
             }

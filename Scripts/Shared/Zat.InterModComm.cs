@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using Newtonsoft.Json;
 
 /// <summary>
@@ -23,7 +21,6 @@ namespace Zat.Shared.InterModComm
         private Dictionary<string, Component> ports = new Dictionary<string, Component>();
 
         private class RequestEvent : UnityEvent<IRequestHandler> { }
-        public static KCModHelper helper;
         public void Update()
         {
             //Process timed out requests
@@ -31,7 +28,10 @@ namespace Zat.Shared.InterModComm
             pendingResponses = pendingResponses.Except(timedOut).ToList();
 
             foreach (var timeOut in timedOut)
+            {
+                //Debugging.Log("InterModComm", $"TimeOut {timeOut.ID}");
                 timeOut.OnTimeout?.Invoke();
+            }
         }
 
         /// <summary>
@@ -59,7 +59,11 @@ namespace Zat.Shared.InterModComm
                 {
                     var handler = new IMCRequestHandler(message);
                     if (!receiveListeners.ContainsKey(message.Name))
+                    {
+
+                        Debugging.Log("InterModComm", $"Unhandled request {message.ToString()}");
                         throw new Exception($"Unhandled request: {message.ToString()}");
+                    }
                     else
                     {
                         receiveListeners[message.Name]?.Invoke(handler, message);
@@ -72,11 +76,8 @@ namespace Zat.Shared.InterModComm
             }
             catch (Exception ex)
             {
-                if (helper != null)
-                {
-                    helper.Log($"Failed to process message: {ex.Message}");
-                    helper.Log($"Failed to process message: {ex.StackTrace}");
-                }
+                Debugging.Log("InterModComm", $"Failed to process message: {ex.Message}");
+                Debugging.Log("InterModComm", $"Failed to process message: {ex.StackTrace}");
             }
         }
 

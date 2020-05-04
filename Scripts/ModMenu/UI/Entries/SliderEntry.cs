@@ -1,17 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using UnityEngine;
-using TMPro;
-using UnityEngine.Events;
-using UnityEngine.UI;
+﻿using TMPro;
 
 namespace Zat.ModMenu.UI.Entries
 {
     public class SliderEntry : BaseEntry
     {
-        private Slider slider;
+        private UnityEngine.UI.Slider slider;
         private TextMeshProUGUI label;
 
         public float Minimum
@@ -39,7 +32,7 @@ namespace Zat.ModMenu.UI.Entries
             get { return slider?.wholeNumbers ?? false; }
             set { if (slider) slider.wholeNumbers = value; }
         }
-        public Slider.SliderEvent OnValueChange
+        public UnityEngine.UI.Slider.SliderEvent OnValueChange
         {
             get { return slider?.onValueChanged; }
         }
@@ -48,7 +41,7 @@ namespace Zat.ModMenu.UI.Entries
         {
             base.RetrieveControls();
 
-            slider = transform.Find("Slider/Value")?.GetComponent<Slider>();
+            slider = transform.Find("Slider/Value")?.GetComponent<UnityEngine.UI.Slider>();
             label = transform.Find("Slider/Label")?.GetComponent<TextMeshProUGUI>();
         }
 

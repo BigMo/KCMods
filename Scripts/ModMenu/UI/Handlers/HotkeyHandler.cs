@@ -1,11 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System;
 using UnityEngine;
-using TMPro;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using Zat.ModMenu.UI.Entries;
 using Zat.Shared.ModMenu.API;
 

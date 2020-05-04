@@ -1,17 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
-using UnityEngine.Events;
-using UnityEngine.UI;
 
 namespace Zat.ModMenu.UI.Entries
 {
     public class CategoryEntry : MonoBehaviour
     {
-        private Toggle toggle;
+        private UnityEngine.UI.Toggle toggle;
         private GameObject content;
         private TextMeshProUGUI _name;
         private TextMeshProUGUI mods;
@@ -48,6 +42,7 @@ namespace Zat.ModMenu.UI.Entries
         public void Start()
         {
             Setup();
+            Expanded = false;
         }
 
         public void Setup()
@@ -64,7 +59,7 @@ namespace Zat.ModMenu.UI.Entries
             content = transform.Find("Content")?.gameObject;
             foreach (Transform obj in content.transform)
                 Destroy(obj.gameObject);
-            toggle = transform.Find("Body/Toggle")?.GetComponent<Toggle>();
+            toggle = transform.Find("Body/Toggle")?.GetComponent<UnityEngine.UI.Toggle>();
             _name = transform.Find("Body/Name")?.GetComponent<TextMeshProUGUI>();
             mods = transform.Find("Body/Mods")?.GetComponent<TextMeshProUGUI>();
         }
@@ -72,7 +67,7 @@ namespace Zat.ModMenu.UI.Entries
         {
             categoryToggle = toggle.gameObject.AddComponent<CategoryToggle>();
 
-            if (toggle.onValueChanged == null) toggle.onValueChanged = new Toggle.ToggleEvent();
+            if (toggle.onValueChanged == null) toggle.onValueChanged = new UnityEngine.UI.Toggle.ToggleEvent();
             toggle.onValueChanged.AddListener(ExpandCollapse);
 
             _name.alignment = TextAlignmentOptions.MidlineLeft;
@@ -88,10 +83,10 @@ namespace Zat.ModMenu.UI.Entries
 
         public void UpdateLayout()
         {
-            LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
-            LayoutRebuilder.ForceRebuildLayoutImmediate(gameObject.GetComponent<RectTransform>());
+            UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
+            UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(gameObject.GetComponent<RectTransform>());
             if (Parent != null) Parent.UpdateLayout();
-            else LayoutRebuilder.ForceRebuildLayoutImmediate(transform.parent?.GetComponent<RectTransform>());
+            else UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(transform.parent?.GetComponent<RectTransform>());
         }
 
         public T GetContentEntry<T>(string name) where T : Component

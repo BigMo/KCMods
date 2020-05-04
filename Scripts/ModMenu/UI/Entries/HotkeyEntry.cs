@@ -1,13 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System;
+﻿using System;
 using UnityEngine;
 using TMPro;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using Zat.Shared.ModMenu.API;
-using Button = UnityEngine.UI.Button;
 
 namespace Zat.ModMenu.UI.Entries
 {
@@ -15,7 +10,7 @@ namespace Zat.ModMenu.UI.Entries
     {
         public class KeyEvent : UnityEvent<Hotkey> { }
         
-        private Button button;
+        private UnityEngine.UI.Button button;
         private TextMeshProUGUI label;
         private KeyEvent keyChanged = new KeyEvent();
         public bool recordKeys = false;
@@ -59,7 +54,7 @@ namespace Zat.ModMenu.UI.Entries
         {
             base.RetrieveControls();
 
-            button = transform.Find("Button")?.GetComponent<Button>();
+            button = transform.Find("Button")?.GetComponent<UnityEngine.UI.Button>();
             label = transform.Find("Button/Text")?.GetComponent<TextMeshProUGUI>();
             button.onClick.AddListener(() =>
             {

@@ -1,11 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
-using TMPro;
 using UnityEngine.EventSystems;
 
 namespace Zat.Shared.UI.Utilities

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Zat.Productivity.Buildings;
-using Zat.Shared.ModMenu.Interactive;
+﻿using Zat.Shared.ModMenu.Interactive;
 
 namespace Zat.Productivity
 {

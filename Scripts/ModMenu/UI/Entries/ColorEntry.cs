@@ -1,38 +1,29 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using UnityEngine;
-using TMPro;
+﻿using TMPro;
 using UnityEngine.Events;
-using UnityEngine.UI;
-using Zat.Shared.ModMenu.API;
-using Color = Zat.Shared.ModMenu.API.Color;
-using Slider = UnityEngine.UI.Slider;
 
 namespace Zat.ModMenu.UI.Entries
 {
     public class ColorEntry : BaseEntry
     {
-        private Slider sliderA, sliderR, sliderG, sliderB;
-        private Image image;
+        private UnityEngine.UI.Slider sliderA, sliderR, sliderG, sliderB;
+        private UnityEngine.UI.Image image;
         private TextMeshProUGUI labelA, labelR, labelB, labelG;
         private ColorChangeEvent colorChange;
-        public class ColorChangeEvent : UnityEvent<Color> { }
+        public class ColorChangeEvent : UnityEvent<Zat.Shared.ModMenu.API.Color> { }
         
-        public Color Color
+        public Zat.Shared.ModMenu.API.Color Color
         {
             get
             {
                 if (image)
-                    return new Color()
+                    return new Zat.Shared.ModMenu.API.Color()
                     {
                         a = image.color.a,
                         r = image.color.r,
                         g = image.color.g,
                         b = image.color.b,
                     };
-                return new Color();
+                return new Zat.Shared.ModMenu.API.Color();
             }
             set
             {
@@ -61,11 +52,11 @@ namespace Zat.ModMenu.UI.Entries
             base.RetrieveControls();
             colorChange = new ColorChangeEvent();
 
-            image = transform.Find("RGB/Color")?.GetComponent<Image>();
-            sliderA = transform.Find("RGB/Channels/A/Value")?.GetComponent<Slider>();
-            sliderR = transform.Find("RGB/Channels/R/Value")?.GetComponent<Slider>();
-            sliderG = transform.Find("RGB/Channels/G/Value")?.GetComponent<Slider>();
-            sliderB = transform.Find("RGB/Channels/B/Value")?.GetComponent<Slider>();
+            image = transform.Find("RGB/Color")?.GetComponent<UnityEngine.UI.Image>();
+            sliderA = transform.Find("RGB/Channels/A/Value")?.GetComponent<UnityEngine.UI.Slider>();
+            sliderR = transform.Find("RGB/Channels/R/Value")?.GetComponent<UnityEngine.UI.Slider>();
+            sliderG = transform.Find("RGB/Channels/G/Value")?.GetComponent<UnityEngine.UI.Slider>();
+            sliderB = transform.Find("RGB/Channels/B/Value")?.GetComponent<UnityEngine.UI.Slider>();
             labelA = transform.Find("RGB/Channels/A/Label")?.GetComponent<TextMeshProUGUI>();
             labelR = transform.Find("RGB/Channels/R/Label")?.GetComponent<TextMeshProUGUI>();
             labelG = transform.Find("RGB/Channels/G/Label")?.GetComponent<TextMeshProUGUI>();
@@ -88,7 +79,7 @@ namespace Zat.ModMenu.UI.Entries
 
         private void UpdateColor(float v)
         {
-            Color = new Color()
+            Color = new Zat.Shared.ModMenu.API.Color()
             {
                 a = sliderA?.value ?? 0,
                 r = sliderR?.value ?? 0,

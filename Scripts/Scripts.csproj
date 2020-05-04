@@ -300,6 +300,8 @@
   <ItemGroup>
     <Compile Include="Shared\Zat.AssetLoading.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="Shared\Zat.Debugging.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

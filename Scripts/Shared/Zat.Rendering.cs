@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Zat.Shared.Rendering
@@ -28,13 +24,13 @@ namespace Zat.Shared.Rendering
 
         private static Dictionary<int, RingArray> ringDict = new Dictionary<int, RingArray>();
 
-        public static Color Color
+        public static UnityEngine.Color Color
         {
             get { return GUI.color; }
             set { GUI.color = value; }
         }
 
-        public static void DrawLine(Vector2 from, Vector2 to, float thickness, Color color)
+        public static void DrawLine(Vector2 from, Vector2 to, float thickness, UnityEngine.Color color)
         {
             Color = color;
             DrawLine(from, to, thickness);
@@ -47,7 +43,7 @@ namespace Zat.Shared.Rendering
             DrawBox(from, Vector2.right * (from - to).magnitude, thickness, false);
             GUIUtility.RotateAroundPivot(-angle, from);
         }
-        public static void FillBox(Vector2 position, Vector2 size, Color color, bool centered = true)
+        public static void FillBox(Vector2 position, Vector2 size, UnityEngine.Color color, bool centered = true)
         {
             Color = color;
             FillBox(position, size, centered);
@@ -57,7 +53,7 @@ namespace Zat.Shared.Rendering
             var upperLeft = centered ? position - size / 2f : position;
             GUI.DrawTexture(new Rect(position.x, position.y, size.x, size.y), Texture2D.whiteTexture);
         }
-        public static void DrawBox(Vector2 position, Vector2 size, float thickness, Color color, bool centered = true)
+        public static void DrawBox(Vector2 position, Vector2 size, float thickness, UnityEngine.Color color, bool centered = true)
         {
             Color = color;
             DrawBox(position, size, thickness, centered);
@@ -71,7 +67,7 @@ namespace Zat.Shared.Rendering
             GUI.DrawTexture(new Rect(position.x, position.y + size.y, size.x + thickness, thickness), Texture2D.whiteTexture);
         }
 
-        public static void DrawCross(Vector2 position, Vector2 size, float thickness, Color color)
+        public static void DrawCross(Vector2 position, Vector2 size, float thickness, UnityEngine.Color color)
         {
             Color = color;
             DrawCross(position, size, thickness);
@@ -82,7 +78,7 @@ namespace Zat.Shared.Rendering
             GUI.DrawTexture(new Rect(position.x, position.y - size.y / 2f, thickness, size.y), Texture2D.whiteTexture);
         }
 
-        public static void DrawDot(Vector2 position, Color color)
+        public static void DrawDot(Vector2 position, UnityEngine.Color color)
         {
             Color = color;
             DrawDot(position);
@@ -92,7 +88,7 @@ namespace Zat.Shared.Rendering
             DrawBox(position - Vector2.one, Vector2.one * 2f, 1f);
         }
 
-        public static void DrawString(Vector2 position, string label, Color color, bool centered = true)
+        public static void DrawString(Vector2 position, string label, UnityEngine.Color color, bool centered = true)
         {
             Color = color;
             DrawString(position, label, centered);
@@ -107,9 +103,9 @@ namespace Zat.Shared.Rendering
 
         public static void DrawCircle(Vector2 position, float radius, int numSides, bool centered = true, float thickness = 1f)
         {
-            DrawCircle(position, radius, numSides, Color.white, centered, thickness);
+            DrawCircle(position, radius, numSides, UnityEngine.Color.white, centered, thickness);
         }
-        public static void DrawCircle(Vector2 position, float radius, int numSides, Color color, bool centered = true, float thickness = 1f)
+        public static void DrawCircle(Vector2 position, float radius, int numSides, UnityEngine.Color color, bool centered = true, float thickness = 1f)
         {
             RingArray arr;
             if (ringDict.ContainsKey(numSides))

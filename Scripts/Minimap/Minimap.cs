@@ -1,24 +1,16 @@
-﻿using Harmony;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Events;
-using Newtonsoft.Json;
 using Zat.Shared.ModMenu.API;
-using Color = UnityEngine.Color;
-using Zat.Shared.Rendering;
 using Zat.Shared.Reflection;
 using UnityEngine.UI;
 using TMPro;
-using Button = UnityEngine.UI.Button;
 using UnityEngine.EventSystems;
 using Zat.Shared.UI.Utilities;
 using Zat.Shared.ModMenu.Interactive;
+using Zat.Shared.InterModComm;
+using Zat.Shared;
 
 namespace Zat.Minimap
 {
@@ -32,18 +24,12 @@ namespace Zat.Minimap
         private static GameObject go;
 
         public static bool Instantiated { get { return go != null; } }
-        
-        private float zoomFactor = 1f;
-
-        private float updateInterval = 5f;
-        private bool fixedMap = false;
-        private bool dynamicZoom = false;
 
         private GameObject mapUI;
         private RectTransform header, mapBody, mapTexture, arrowBody, arrowImageBody;
         private Image arrowImage;
         private RawImage mapImage;
-        private Button headerButton;
+        private UnityEngine.UI.Button headerButton;
 
         private ModSettingsProxy proxy;
 
@@ -118,6 +104,7 @@ namespace Zat.Minimap
         private UnitIndicatorPool pool = new UnitIndicatorPool();
 
         private MinimapSettings settings;
+        private bool showFullscreen = false;
 
         public void Start()
         {
@@ -144,14 +131,18 @@ namespace Zat.Minimap
                 arrowImage = gameObject.transform.Find("MapUI/MapBody/Margin/MapTexture/Arrow/Image")?.GetComponent<Image>();
                 arrowImageBody = gameObject.transform.Find("MapUI/MapBody/Margin/MapTexture/Arrow/Image")?.GetComponent<RectTransform>();
                 mapImage = gameObject.transform.Find("MapUI/MapBody/Margin/MapTexture")?.GetComponent<RawImage>();
-                headerButton = gameObject.transform.Find("MapUI/Header/Close")?.GetComponent<Button>();
+                headerButton = gameObject.transform.Find("MapUI/Header/Close")?.GetComponent<UnityEngine.UI.Button>();
                 var headerText = gameObject.transform.Find("MapUI/Header/Text")?.GetComponent<TextMeshProUGUI>();
                 headerText.alignment = TextAlignmentOptions.Midline;
                 var events = mapImage.gameObject.AddComponent<EventTrigger>();
-                var trigger = new EventTrigger.Entry();
-                trigger.eventID = EventTriggerType.PointerClick;
-                trigger.callback.AddListener(OnMapClick);
-                events.triggers.Add(trigger);
+                var click = new EventTrigger.Entry();
+                click.eventID = EventTriggerType.PointerClick;
+                click.callback.AddListener(OnMapClick);
+                var scroll = new EventTrigger.Entry();
+                scroll.eventID = EventTriggerType.Scroll;
+                scroll.callback.AddListener(OnMapScroll);
+                events.triggers.Add(click);
+                events.triggers.Add(scroll);
 
                 pool.parent = mapTexture?.transform;
 
@@ -163,10 +154,16 @@ namespace Zat.Minimap
                 SetPos(0, 0);
                 mapImage.texture = tex;
 
+
+                Debugging.Active = true;
+                Debugging.Helper = Loader.Helper;
                 var config = new InteractiveConfiguration<MinimapSettings>();
                 settings = config.Settings;
-
-                ModSettingsBootstrapper.Register(config.ModConfig, OnModRegistered, (ex) =>
+                ModSettingsBootstrapper.Register(config.ModConfig, (proxy, saved) =>
+                {
+                    config.Install(proxy, saved);
+                    OnModRegistered(proxy, saved);
+                }, (ex) =>
                 {
                     Loader.Helper.Log($"Failed to register mod: {ex.Message}");
                     Loader.Helper.Log(ex.StackTrace);
@@ -177,6 +174,13 @@ namespace Zat.Minimap
                 Loader.Helper.Log(ex.Message);
                 Loader.Helper.Log(ex.StackTrace);
             }
+        }
+
+        private void OnMapScroll(BaseEventData arg0)
+        {
+            var scrollData = (PointerEventData)arg0;
+            if (settings == null) return;
+            settings.Visual.Size.Value += scrollData.scrollDelta.y;
         }
 
         private void OnMapClick(BaseEventData arg0)
@@ -215,63 +219,77 @@ namespace Zat.Minimap
 
         private void OnModRegistered(ModSettingsProxy proxy, SettingsEntry[] saved)
         {
-            this.proxy = proxy;
-            if (!proxy)
+            try
             {
-                Loader.Helper.Log("Failed to register proxy!");
-                return;
+                this.proxy = proxy;
+                if (!proxy)
+                {
+                    Loader.Helper.Log("Failed to register proxy!");
+                    return;
+                }
+
+                settings.Enabled.OnUpdate.AddListener((setting) =>
+                {
+                    mapUI.SetActive(settings.Enabled.Value);
+                    settings.Enabled.Label = mapUI.activeSelf ? "Visible" : "Hidden";
+                });
+                settings.UpdateInterval.OnUpdate.AddListener((setting) => settings.UpdateInterval.Label = $"Every {(int)setting.slider.value}s");
+                //Visuals
+                settings.Visual.Size.OnUpdate.AddListener((setting) =>
+                {
+                    SetSize(setting.slider.value);
+                    settings.Visual.Size.Label = $"Size: {(int)setting.slider.value}px";
+                });
+                settings.Visual.PositionX.OnUpdate.AddListener((setting) =>
+                {
+                    SetPos(setting.slider.value, settings.Visual.PositionY.Value);
+                    settings.Visual.PositionX.Label = $"X: {(int)setting.slider.value}";
+                });
+                settings.Visual.PositionY.OnUpdate.AddListener((setting) =>
+                {
+                    SetPos(settings.Visual.PositionX.Value, setting.slider.value);
+                    settings.Visual.PositionY.Label = $"Y: {(int)setting.slider.value}";
+                });
+                //Camera
+                settings.Visual.Indicators.Camera.Enabled.OnUpdate.AddListener((setting) =>
+                {
+                    arrowBody.gameObject.SetActive(setting.toggle.value);
+                });
+                settings.Visual.Indicators.Camera.Color.OnUpdate.AddListener((setting) => arrowImage.color = setting.color.ToUnityColor());
+                settings.Visual.Indicators.Camera.Size.OnUpdate.AddListener((setting) =>
+                {
+                    arrowImageBody.sizeDelta = new Vector2(setting.slider.value, setting.slider.value);
+                });
+
+                //Indicators
+                SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Camera);
+                SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Armies);
+                SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Dragons);
+                SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Vikings);
+
+                SetSize(settings.Visual.Size.Value);
+                SetPos(
+                    settings.Visual.PositionX.Value,
+                    settings.Visual.PositionY.Value
+                );
+
+                Loader.Helper.Log("OnRegisterMod finished");
             }
-
-            settings.Enabled.OnUpdate.AddListener((setting) =>
+            catch(Exception ex)
             {
-                mapUI.SetActive(settings.Enabled.Value);
-                settings.Enabled.Label = mapUI.activeSelf ? "Visible" : "Hidden";
-            });
-            settings.UpdateInterval.OnUpdate.AddListener((setting) => settings.UpdateInterval.Label = $"Every {(int)setting.slider.value}s");
-            //Visuals
-            settings.Visual.Size.OnUpdate.AddListener((setting) =>
-            {
-                SetSize(setting.slider.value);
-                settings.Visual.Size.Label = $"Size: {(int)setting.slider.value}px";
-            });
-            settings.Visual.PositionX.OnUpdate.AddListener((setting) =>
-            {
-                SetPos(setting.slider.value, settings.Visual.PositionY.Value);
-                settings.Visual.PositionX.Label = $"X: {(int)setting.slider.value}";
-            });
-            settings.Visual.PositionY.OnUpdate.AddListener((setting) =>
-            {
-                SetPos(settings.Visual.PositionX.Value, setting.slider.value);
-                settings.Visual.PositionY.Label = $"Y: {(int)setting.slider.value}";
-            });
-            //Camera
-            settings.Visual.Indicators.Camera.Enabled.OnUpdate.AddListener((setting) =>
-            {
-                arrowBody.gameObject.SetActive(setting.toggle.value);
-            });
-            settings.Visual.Indicators.Camera.Color.OnUpdate.AddListener((setting) => arrowImage.color = setting.color.ToUnityColor() );
-            settings.Visual.Indicators.Camera.Size.OnUpdate.AddListener((setting) =>
-            {
-                arrowImageBody.sizeDelta = new Vector2(setting.slider.value, setting.slider.value);
-            });
-
-            //Indicators
-            SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Camera);
-            SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Armies);
-            SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Dragons);
-            SetupResponsiveIndicatorEntry(settings.Visual.Indicators.Vikings);
-
-            SetSize(settings.Visual.Size.Value);
-            SetPos(
-                settings.Visual.PositionX.Value,
-                settings.Visual.PositionY.Value
-            );
+                Loader.Helper.Log($"OnRegisterMod failed: {ex.Message}");
+                Loader.Helper.Log(ex.StackTrace);
+            }
         }
 
         private void SetupResponsiveIndicatorEntry(IndicatorEntry entry)
         {
             entry.Enabled.OnUpdate.AddListener((setting) => entry.Enabled.Label = setting.toggle.value ? "Visible" : "Hidden");
             entry.Size.OnUpdate.AddListener((setting) => entry.Size.Label = $"Size: {(int)setting.slider.value}px" );
+
+            entry.Enabled.TriggerUpdate();
+            entry.Color.TriggerUpdate();
+            entry.Size.TriggerUpdate();
         }
 
         private void Update()
@@ -279,10 +297,10 @@ namespace Zat.Minimap
             if (Time.time > nextUpdate)
                 UpdateMap();
             if (settings == null) return;
-            if (Input.GetKeyDown(settings.Key.Key))
-            {
+            if (Input.GetKeyDown(settings.MapKey.Key))
                 settings.Enabled.Value = !settings.Enabled.Value;
-            }
+            if (Input.GetKeyDown(settings.FullscreenKey.Key))
+                showFullscreen = !showFullscreen;
             UpdateArrow();
             try
             {
@@ -295,6 +313,14 @@ namespace Zat.Minimap
                     Loader.Helper.Log(ex.StackTrace);
                 }
             }
+        }
+
+        private void OnGUI()
+        {
+            if (!showFullscreen || !tex) return;
+            var size = Mathf.Min(Screen.width, Screen.height);
+            var pos = new Vector2(Screen.width / 2 - size / 2, Screen.height / 2 - size / 2);
+            GUI.DrawTexture(new Rect(pos.x, pos.y, size, size), tex);
         }
 
         private void UpdateIndicators()
@@ -346,11 +372,12 @@ namespace Zat.Minimap
                 renderCam.Render();
                 renderCam.enabled = false;
             }
-            nextUpdate = Time.time + updateInterval;
+            nextUpdate = Time.time + (settings?.UpdateInterval?.Value ?? 5);
         }
 
         private void UpdateArrow()
         {
+            if (settings == null) return;
             var newPos = (Vector2.one * settings.Visual.Size) * (Scroll * new Vector2(1,-1));
             arrowBody.anchoredPosition = newPos;
             arrowBody.rotation = Quaternion.Euler(0, 0, -CamRotation - 270);

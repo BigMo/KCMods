@@ -1,23 +1,4 @@
-﻿using Harmony;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.Events;
-using Newtonsoft.Json;
-using Zat.Shared.ModMenu.API;
-using Color = UnityEngine.Color;
-using Zat.Shared.Rendering;
-using Zat.Shared.Reflection;
-using UnityEngine.UI;
-using TMPro;
-using Button = UnityEngine.UI.Button;
-using UnityEngine.EventSystems;
-using Zat.Shared.UI.Utilities;
+﻿using UnityEngine;
 
 namespace Zat.Minimap
 {

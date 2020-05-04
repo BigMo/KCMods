@@ -1,11 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using UnityEngine;
+﻿using System.Linq;
 using TMPro;
-using UnityEngine.Events;
-using UnityEngine.UI;
 
 namespace Zat.ModMenu.UI.Entries
 {

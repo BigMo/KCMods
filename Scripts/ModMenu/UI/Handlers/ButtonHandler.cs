@@ -1,11 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System;
 using UnityEngine;
-using TMPro;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using Zat.ModMenu.UI.Entries;
 using Zat.Shared.ModMenu.API;
 
@@ -19,7 +15,11 @@ namespace Zat.ModMenu.UI.Handlers
             var button = go.AddComponent<ButtonEntry>();
             button.Setup();
             AssignValue(button, data);
-            button.OnClick?.AddListener(onUpdate);
+            button.OnStateChanged.AddListener((state) =>
+            {
+                data.button.state = state;
+                onUpdate?.Invoke();
+            });
             return button;
         }
 
@@ -34,6 +34,7 @@ namespace Zat.ModMenu.UI.Handlers
             button.Name = data.GetPathElements()?.Last();
             button.Description = data.description;
             button.Label = data.button.label;
+            //button.State = data.button.state;
         }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 namespace Zat.ModMenu.UI
 {
@@ -13,21 +7,21 @@ namespace Zat.ModMenu.UI
     /// </summary>
     public class CategoryToggle : MonoBehaviour
     {
-        private Toggle toggle;
-        private Image image;
+        private UnityEngine.UI.Toggle toggle;
+        private UnityEngine.UI.Image image;
 
         public Sprite imageOn, imageOff;
         
         public void Start()
         {
-            toggle = GetComponent<Toggle>();
-            image = transform.Find("Background/Checkmark")?.GetComponent<Image>();
+            toggle = GetComponent<UnityEngine.UI.Toggle>();
+            image = transform.Find("Background/Checkmark")?.GetComponent<UnityEngine.UI.Image>();
             imageOn = Loader.Assets.GetSprite("assets/workspace/ModMenu/minus.png");
             imageOff = Loader.Assets.GetSprite("assets/workspace/ModMenu/plus.png");
             if (imageOn == null) Loader.Helper.Log("Missing sprite!");
             if (toggle)
             {
-                if (toggle.onValueChanged == null) toggle.onValueChanged = new Toggle.ToggleEvent();
+                if (toggle.onValueChanged == null) toggle.onValueChanged = new UnityEngine.UI.Toggle.ToggleEvent();
                 toggle.onValueChanged.AddListener(UpdateImage);
                 toggle.isOn = true;
                 UpdateImage(toggle.isOn);

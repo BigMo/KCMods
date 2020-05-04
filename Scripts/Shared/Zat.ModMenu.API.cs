@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
-using TMPro;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using Zat.Shared.InterModComm;
 using System.Reflection;
 using Zat.Shared.ModMenu.API;
@@ -143,10 +140,6 @@ namespace Zat.Shared.ModMenu.API
     public class ModSettingsProxy : MonoBehaviour
     {
         /// <summary>
-        /// Set this to output errors during when debugging
-        /// </summary>
-        public static KCModHelper Helper { get; set; }
-        /// <summary>
         /// IMCPort to communicate through; set by ModSettingsBootstrapper
         /// </summary>
         public IMCPort port;
@@ -169,14 +162,13 @@ namespace Zat.Shared.ModMenu.API
                     Config.UpdateInternalSetting(entry);
                     if (settingsEvents.ContainsKey(entry.path))
                         settingsEvents[entry.path]?.Invoke(entry);
+                    else
+                        Debugging.Log("ModSettingsProxy", $"Received update for unregistered setting: {entry.path}");
                 }
                 catch (Exception ex)
                 {
-                    if (Helper != null)
-                    {
-                        Helper.Log($"[ModSettingsProxy] RegisterReceiveListener({ModSettingsNames.Events.SettingChanged}): Failed to process message. {ex.Message}");
-                        Helper.Log(ex.StackTrace);
-                    }
+                    Debugging.Log("ModSettingsProxy", $"RegisterReceiveListener({ModSettingsNames.Events.SettingChanged}): Failed to process message. {ex.Message}");
+                    Debugging.Log("ModSettingsProxy", ex.StackTrace);
                 }
             });
             port.RegisterReceiveListener(ModSettingsNames.Events.ResetIssued, (handler, source) =>
@@ -187,11 +179,8 @@ namespace Zat.Shared.ModMenu.API
                 }
                 catch (Exception ex)
                 {
-                    if (Helper != null)
-                    {
-                        Helper.Log($"[ModSettingsProxy] RegisterReceiveListener({ModSettingsNames.Events.ResetIssued}): Failed to process message. {ex.Message}");
-                        Helper.Log(ex.StackTrace);
-                    }
+                    Debugging.Log("ModSettingsProxy", $"[ModSettingsProxy] RegisterReceiveListener({ModSettingsNames.Events.ResetIssued}): Failed to process message. {ex.Message}");
+                    Debugging.Log("ModSettingsProxy", ex.StackTrace);
                 }
             });
         }
@@ -225,6 +214,7 @@ namespace Zat.Shared.ModMenu.API
     /// <summary>
     /// Allows for simple construction of a ModConfig using the Builder pattern
     /// </summary>
+    [Obsolete("Will be removed shortly; migrate to using InteractiveSettings")]
     public class ModConfigBuilder
     {
         private ModConfig config;
@@ -580,22 +570,25 @@ namespace Zat.Shared.ModMenu.API
     public class Button : Copyable<Button>, Updatable<Button>
     {
         public string label;
+        public ButtonState state;
 
         public void CopyFrom(Button other)
         {
             label = other.label;
+            state = other.state;
         }
 
         public bool UpdateableFrom(Button other)
         {
-            return label != other.label;
+            return label != other.label || state != other.state;
         }
 
         public override string ToString()
         {
-            return $"[Button] label: \"{label}\"";
+            return $"[Button] label: \"{label}\", state: {state}";
         }
     }
+    public enum ButtonState { Normal, Highlighted, Pressed };
     public class Slider : Copyable<Slider>, Updatable<Slider>
     {
         public float min, max, value;
@@ -846,6 +839,15 @@ namespace Zat.Shared.ModMenu.Interactive
         }
 
         public abstract void UpdateFromRemote(SettingsEntry entry);
+        public void RestoreSetting(SettingsEntry entry)
+        {
+            this.UpdateFromRemote(entry);
+            OnLocalUpdate?.Invoke(Setting);
+        }
+        public void TriggerUpdate()
+        {
+            OnUpdate?.Invoke(Setting);
+        }
         public abstract void Reset();
     }
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
@@ -956,7 +958,6 @@ namespace Zat.Shared.ModMenu.Interactive
             };
             if (!Setting.slider.UpdateableFrom(slider)) return;
             Setting.slider.CopyFrom(slider);
-            OnLocalUpdate?.Invoke(Setting);
             OnUpdatedRemotely?.Invoke(Setting);
         }
     }
@@ -1272,10 +1273,67 @@ namespace Zat.Shared.ModMenu.Interactive
             OnUpdatedRemotely?.Invoke(Setting);
         }
     }
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class ButtonAttribute : Attribute
+    {
+        public string Label { get; private set; }
+        public ButtonAttribute(string label)
+        {
+            Label = label;
+        }
+    }
+    public class InteractiveButton : InteractiveSetting
+    {
+        private ButtonAttribute defaultValues;
 
+        public string Label
+        {
+            get { return Setting.button.label; }
+            set
+            {
+                if (Setting.button.label == value) return;
+                Setting.button.label = value;
+                OnLocalUpdate?.Invoke(Setting);
+            }
+        }
+
+        public ButtonState State
+        {
+            get { return Setting.button.state; }
+        }
+
+        public InteractiveButton(SettingsEntry entry, ButtonAttribute values) : base(entry)
+        {
+            defaultValues = values;
+            entry.type = EntryType.Button;
+            entry.button = new Button()
+            {
+                label = values.Label
+            };
+        }
+
+        public override EntryType Type { get { return EntryType.Button; } }
+
+        public override void Reset()
+        {
+            var button = new Button()
+            {
+                label = defaultValues.Label
+            };
+            if (!Setting.button.UpdateableFrom(button)) return;
+            Setting.button.CopyFrom(button);
+            OnLocalUpdate?.Invoke(Setting);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+
+        public override void UpdateFromRemote(SettingsEntry entry)
+        {
+            Setting.button.CopyFrom(entry.button);
+            OnUpdatedRemotely?.Invoke(Setting);
+        }
+    }
     public class InteractiveConfiguration<T> where T : class, new()
     {
-        public static KCModHelper Helper { get; set; }
         public T Settings { get; private set; }
         public ModConfig ModConfig { get; private set; }
         private List<InteractiveSetting> interactiveSettings;
@@ -1289,10 +1347,8 @@ namespace Zat.Shared.ModMenu.Interactive
         {
             foreach (var setting in interactiveSettings)
             {
-                if (Helper != null) Helper.Log($"Registering listeners for {setting.Path}");
                 proxy.AddSettingsChangedListener(setting.Path, (entry) =>
                 {
-                    if (Helper != null) Helper.Log($"{entry.path} was updated [{setting.GetType().Name}]");
                     setting.UpdateFromRemote(entry);
                 });
                 setting.OnLocalUpdate.AddListener((entry) => proxy.UpdateSetting(entry, null, null));
@@ -1300,6 +1356,7 @@ namespace Zat.Shared.ModMenu.Interactive
 
             proxy.AddResetIssuedListener(() =>
             {
+                Debugging.Log("InteractiveConfig", $"Received reset command, resetting {interactiveSettings.Count} settings...");
                 foreach (var setting in interactiveSettings)
                     setting.Reset();
             });
@@ -1307,8 +1364,12 @@ namespace Zat.Shared.ModMenu.Interactive
             foreach (var setting in oldSettings)
             {
                 var currentSetting = interactiveSettings.Where(s => s.Path == setting.path).FirstOrDefault();
-                if (currentSetting == null) continue;
-                currentSetting.UpdateFromRemote(setting);
+                if (currentSetting == null)
+                {
+                    Debugging.Log("InteractiveConfig", $"Received outdated setting: {setting.path}");
+                    continue;
+                }
+                currentSetting.RestoreSetting(setting);
             }
         }
         private void Parse()
@@ -1369,14 +1430,14 @@ namespace Zat.Shared.ModMenu.Interactive
                 };
                 if (modSettings.Any(s => s.path == entry.path))
                 {
-                    if (Helper != null) Helper.Log($"Failed to initialize interactive setting of \"{entry.path}\": already registered");
+                    Debugging.Log("InteractiveConfig", $"Failed to initialize interactive setting of \"{entry.path}\": already registered");
                     continue;
                 }
                 modSettings.Add(entry);
                 var interactiveSetting = Activator.CreateInstance(setting.Item1.PropertyType, entry, setting.Item3) as InteractiveSetting;
                 if (interactiveSetting == null)
                 {
-                    if (Helper != null) Helper.Log($"Failed to initialize interactive setting of \"{entry.path}\": Activator returned NULL");
+                    Debugging.Log("InteractiveConfig", $"Failed to initialize interactive setting of \"{entry.path}\": Activator returned NULL");
                     continue;
                 }
                 interactiveSettings.Add(interactiveSetting);

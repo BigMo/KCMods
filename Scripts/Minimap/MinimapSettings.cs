@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 using Zat.Shared.ModMenu.Interactive;
 
 namespace Zat.Minimap
 {
-    [Mod("Minimap", "v1.3.2", "Zat")]
+    [Mod("Minimap", "v1.3", "Zat")]
     public class MinimapSettings
     {
 
@@ -15,9 +11,13 @@ namespace Zat.Minimap
         [Toggle(true, "Visible")]
         public InteractiveToggleSetting Enabled { get; private set; }
 
-        [Setting("Key", "What button to press to toggle the map on/off")]
+        [Setting("Minimap Hotkey", "What button to press to toggle the map on/off")]
         [Hotkey(KeyCode.M)]
-        public InteractiveHotkeySetting Key { get; private set; }
+        public InteractiveHotkeySetting MapKey { get; private set; }
+
+        [Setting("Fullscreen Hotkey", "What button to press to toggle the fullscreen map on/off")]
+        [Hotkey(KeyCode.N)]
+        public InteractiveHotkeySetting FullscreenKey { get; private set; }
 
         [Setting("Update Interval", "Interval between minimap updates")]
         [Slider(1, 30, 5, "Every 5s", true)]
@@ -30,7 +30,7 @@ namespace Zat.Minimap
     public class VisualSettings
     {
         [Setting("Size", "Width and height of the map in pixels")]
-        [Slider(100,1024,30, "Size: 128px", true)]
+        [Slider(100, 1024, 128, "Size: 128px", true)]
         public InteractiveSliderSetting Size { get; private set; }
 
         [Setting("Position X", "Where the map is placed horizontally")]
