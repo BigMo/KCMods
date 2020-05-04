@@ -10,6 +10,7 @@ using Zat.ModMenu.UI.Entries;
 using Newtonsoft.Json;
 using Zat.Shared.UI.Utilities;
 using Zat.Shared;
+using Zat.Shared.ModMenu.Interactive;
 
 namespace Zat.ModMenu.UI
 {
@@ -22,10 +23,11 @@ namespace Zat.ModMenu.UI
         private GameObject content, noMods;
         private IMCPort port;
         private GameObject ui;
-        private SettingsManager settings;
+        private SettingsManager settingsManager;
         private SettingsEntry[] savedSettings;
         private bool isSaving = false;
         private bool collapseExpandState = false;
+        private ModMenuSettings menuSettings;
 
         public string Header
         {
@@ -55,7 +57,7 @@ namespace Zat.ModMenu.UI
                 noMods = transform.Find("ModSettingsUI/NoMods")?.gameObject;
                 noModsText = transform.Find("ModSettingsUI/NoMods/Text")?.GetComponent<TextMeshProUGUI>();
                 port = gameObject.AddComponent<IMCPort>();
-                settings = new SettingsManager(content, OnUIUpdate);
+                settingsManager = new SettingsManager(content, OnUIUpdate);
 
                 ui = transform.Find("ModSettingsUI")?.gameObject;
                 Instance = this;
@@ -66,7 +68,7 @@ namespace Zat.ModMenu.UI
                 close.onClick.AddListener(() => ui.SetActive(false));
                 reset.onClick.AddListener(() =>
                 {
-                    foreach (var mod in settings.ModGameObjects)
+                    foreach (var mod in settingsManager.ModGameObjects)
                         port.RPC(mod, ModSettingsNames.Events.ResetIssued, 5f, null, null);
                 });
                 save.onClick.AddListener(() => { if (!isSaving) StartCoroutine(SaveSettingsAnim()); });
@@ -90,12 +92,25 @@ namespace Zat.ModMenu.UI
                 SetCollapseExpand(false);
 
                 Loader.Helper.Log($"Started: [{transform.parent?.name ?? "-"}] -> [{transform.name}] -> [{nameof(ModMenuUI)}]");
+
+                var config = new InteractiveConfiguration<ModMenuSettings>();
+                menuSettings = config.Settings;
+                ModSettingsBootstrapper.Register(config.ModConfig, (proxy, saved)=>
+                {
+                    config.Install(proxy, saved);
+                    OnModRegistered(proxy, saved);
+                }, (ex) => { });
             }
             catch (Exception ex)
             {
                 Loader.Helper.Log($"Failed to Start {nameof(ModMenuUI)}: {ex.Message}");
                 Loader.Helper.Log(ex.StackTrace);
             }
+        }
+
+        private void OnModRegistered(ModSettingsProxy arg0, SettingsEntry[] arg1)
+        {
+
         }
 
         private void ToggleCollapseExpand()
@@ -116,7 +131,7 @@ namespace Zat.ModMenu.UI
         }
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.O))
+            if (Input.GetKeyDown(menuSettings?.ToggleKey?.Key ?? KeyCode.O))
                 if (ui != null) ui.SetActive(!ui.activeSelf);
         }
 
@@ -131,7 +146,7 @@ namespace Zat.ModMenu.UI
             isSaving = true;
             try
             {
-                PlayerPrefs.SetString("ModMenu", JsonConvert.SerializeObject(settings.Settings.ToArray()));
+                PlayerPrefs.SetString("ModMenu", JsonConvert.SerializeObject(settingsManager.Settings.ToArray()));
                 PlayerPrefs.Save();
                 return true;
             }
@@ -163,11 +178,11 @@ namespace Zat.ModMenu.UI
         {
             try
             {
-                settings.RegisterMod(source, mod);
+                settingsManager.RegisterMod(source, mod);
                 var _saved = savedSettings != null ? savedSettings.Where(s => mod.settings.Any(m => m.path == s.path)).ToArray() : new SettingsEntry[0];
                 handler.SendResponse(port.gameObject.name, _saved);
                 UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
-                if (noMods != null) noMods.SetActive(!settings.Mods.Any());
+                if (noMods != null) noMods.SetActive(!settingsManager.Mods.Any());
                 SetCollapseExpand(false);
             }
             catch(Exception ex)
@@ -182,7 +197,7 @@ namespace Zat.ModMenu.UI
         {
             try
             {
-                var associatedMods = settings.GetAssociatedMods(setting).ToArray();
+                var associatedMods = settingsManager.GetAssociatedMods(setting).ToArray();
                 if (associatedMods.Length == 0)
                 {
                     Loader.Helper.Log($"Detected UI update for \"{setting.path}\" but it has no associated mods");
@@ -202,7 +217,7 @@ namespace Zat.ModMenu.UI
 
         private void UpdateSettingHandler(IRequestHandler handler, string source, SettingsEntry entry)
         {
-            var context = settings.GetSettingByPath(entry.path);
+            var context = settingsManager.GetSettingByPath(entry.path);
             if (context == null)
             {
                 handler.SendError(port.gameObject.name, $"Entry \"{entry.path}\" not registered!");

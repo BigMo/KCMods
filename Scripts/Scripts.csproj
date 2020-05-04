@@ -267,6 +267,7 @@
     <Compile Include="Minimap\UnitIndicatorPool.cs" />
     <Compile Include="ModMenu\DummyMod.cs" />
     <Compile Include="ModMenu\Loader.cs" />
+    <Compile Include="ModMenu\ModMenuSettings.cs" />
     <Compile Include="ModMenu\SettingsManager.cs" />
     <Compile Include="ModMenu\UI\CategoryToggle.cs" />
     <Compile Include="ModMenu\UI\Entries\BaseEntry.cs" />

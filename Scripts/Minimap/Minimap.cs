@@ -180,7 +180,7 @@ namespace Zat.Minimap
         {
             var scrollData = (PointerEventData)arg0;
             if (settings == null) return;
-            settings.Visual.Size.Value += scrollData.scrollDelta.y;
+            settings.Visual.Size.Value += scrollData.scrollDelta.y * 4f;
         }
 
         private void OnMapClick(BaseEventData arg0)
@@ -191,8 +191,7 @@ namespace Zat.Minimap
             {
                 var perc = (point / settings.Visual.Size.Value) + Vector2.one * 0.5f;
                 var target = perc * WorldSize;
-                //Cam.inst?.BringIntoView(new Vector3(target.x, 0, target.y), new ArrayExt<Vector3>(1));
-                Cam.inst?.SetDesiredTrackingPos(new Vector3(target.x, 0, target.y)); //<- Doesn't work but instead warps the camera around the map
+                Cam.inst?.SetDesiredTrackingPos(new Vector3(target.x, 0, target.y));
             }
         }
         

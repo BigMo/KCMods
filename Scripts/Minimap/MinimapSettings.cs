@@ -3,7 +3,7 @@ using Zat.Shared.ModMenu.Interactive;
 
 namespace Zat.Minimap
 {
-    [Mod("Minimap", "v1.3", "Zat")]
+    [Mod("Minimap", "v1.4", "Zat")]
     public class MinimapSettings
     {
 

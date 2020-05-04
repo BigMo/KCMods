@@ -86,6 +86,7 @@ namespace Zat.ModMenu
                         settings.Add(settingContext);
                         var category = GetCreateCategoryChain(setting);
                         category.AddContent(entry.gameObject);
+                        category.Expanded = false;
                     }
                     settingContext.SubscribedMods.Add(modContext);
                 }
