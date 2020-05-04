@@ -44,7 +44,7 @@ namespace Zat.ModMenu.UI.Entries
             button = transform.Find("Button")?.GetComponent<UnityEngine.UI.Button>();
             label = transform.Find("Button/Text")?.GetComponent<TextMeshProUGUI>();
             state = previousState = ButtonState.Normal;
-            var events = gameObject.AddComponent<EventTrigger>();
+            var events = button.gameObject.AddComponent<EventTrigger>();
             var enter = new EventTrigger.Entry();
             enter.eventID = EventTriggerType.PointerEnter;
             enter.callback.AddListener((d) => State = ButtonState.Highlighted);

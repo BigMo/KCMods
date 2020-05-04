@@ -959,6 +959,7 @@ namespace Zat.Shared.ModMenu.Interactive
             if (!Setting.slider.UpdateableFrom(slider)) return;
             Setting.slider.CopyFrom(slider);
             OnUpdatedRemotely?.Invoke(Setting);
+            OnLocalUpdate?.Invoke(Setting);
         }
     }
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
@@ -1274,7 +1275,7 @@ namespace Zat.Shared.ModMenu.Interactive
         }
     }
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class ButtonAttribute : Attribute
+    public class ButtonAttribute : SpecificSettingAttribute
     {
         public string Label { get; private set; }
         public ButtonAttribute(string label)
@@ -1285,7 +1286,7 @@ namespace Zat.Shared.ModMenu.Interactive
     public class InteractiveButton : InteractiveSetting
     {
         private ButtonAttribute defaultValues;
-
+        private ButtonState previousState;
         public string Label
         {
             get { return Setting.button.label; }
@@ -1302,21 +1303,30 @@ namespace Zat.Shared.ModMenu.Interactive
             get { return Setting.button.state; }
         }
 
+        public UnityEvent OnMouseEntered { get; private set; }
+        public UnityEvent OnMouseLeft { get; private set; }
+        public UnityEvent OnButtonPressed { get; private set; }
+        public UnityEvent MouseUp { get; private set; }
+
         public InteractiveButton(SettingsEntry entry, ButtonAttribute values) : base(entry)
         {
             defaultValues = values;
             entry.type = EntryType.Button;
-            entry.button = new Button()
+            entry.button = new API.Button()
             {
                 label = values.Label
             };
+            OnMouseEntered = new UnityEvent();
+            OnMouseLeft = new UnityEvent();
+            OnButtonPressed = new UnityEvent();
         }
 
         public override EntryType Type { get { return EntryType.Button; } }
 
         public override void Reset()
         {
-            var button = new Button()
+            previousState = ButtonState.Normal;
+            var button = new API.Button()
             {
                 label = defaultValues.Label
             };
@@ -1328,7 +1338,16 @@ namespace Zat.Shared.ModMenu.Interactive
 
         public override void UpdateFromRemote(SettingsEntry entry)
         {
+            bool stateChanged = previousState != Setting.button.state;
+            if (stateChanged)
+                previousState = Setting.button.state;
             Setting.button.CopyFrom(entry.button);
+            if (stateChanged)
+            {
+                if (State == ButtonState.Pressed) OnButtonPressed?.Invoke();
+                if (State == ButtonState.Normal) OnMouseLeft?.Invoke();
+                if (State == ButtonState.Highlighted && previousState == ButtonState.Normal) OnMouseEntered?.Invoke();
+            }
             OnUpdatedRemotely?.Invoke(Setting);
         }
     }
