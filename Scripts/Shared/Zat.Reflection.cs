@@ -12,6 +12,10 @@ namespace Zat.Shared.Reflection
         {
             return obj.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         }
+        private static MethodInfo GetMethodInfo(object obj, string name)
+        {
+            return obj.GetType().GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        }
 
         public static T GetField<T>(this object obj, string name)
         {
@@ -30,6 +34,18 @@ namespace Zat.Shared.Reflection
         {
             var prop = GetPropertyInfo(obj, name);
             if (prop != null) prop.SetValue(obj, value, null);
+        }
+
+        public static void CallMethod(this object obj, string methodName, params object[] parameters)
+        {
+            var meth = GetMethodInfo(obj, methodName);
+            if (meth != null) meth.Invoke(obj, parameters);
+        }
+        public static T CallMethod<T>(this object obj, string methodName, params object[] parameters)
+        {
+            var meth = GetMethodInfo(obj, methodName);
+            if (meth != null) return (T)meth.Invoke(obj, parameters);
+            return default(T);
         }
     }
 }

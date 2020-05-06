@@ -21,6 +21,31 @@ namespace Zat.Commander
         private CommandGroup group;
         private float lastClick = 0;
         private int numClicks = 0;
+        private static Gradient HEALTH_GRADIENT;
+        private static Gradient HealthGradient
+        {
+            get
+            {
+                if (HEALTH_GRADIENT == null)
+                {
+                    HEALTH_GRADIENT = new Gradient();
+                    var colors = new GradientColorKey[3];
+                    colors[0].color = UnityEngine.Color.red;
+                    colors[0].time = 0f;
+                    colors[1].color = UnityEngine.Color.yellow;
+                    colors[1].time = 0.5f;
+                    colors[2].color = UnityEngine.Color.green;
+                    colors[2].time = 1f;
+                    var alphas = new GradientAlphaKey[2];
+                    alphas[0].alpha = 1f;
+                    alphas[0].time = 0f;
+                    alphas[0].alpha = 1f;
+                    alphas[0].time = 1f;
+                    HEALTH_GRADIENT.SetKeys(colors, alphas);
+                }
+                return HEALTH_GRADIENT;
+            }
+        }
 
         private bool HasGroup { get { return group?.HasArmies ?? false; } }
 
@@ -116,7 +141,7 @@ namespace Zat.Commander
             count.text = HasGroup ? Group.Count.ToString() : "-";
             var health = HasGroup ? Group.Health : 0;
             healthBar.transform.localScale = new Vector3(health, 1, 1);
-            healthColor.color = Lerp3(UnityEngine.Color.red, UnityEngine.Color.yellow, UnityEngine.Color.green, health);
+            healthColor.color = HealthGradient.Evaluate(health);
 
             iconsSoldier.SetActive(false);
             iconsArcher.SetActive(false);
@@ -139,14 +164,6 @@ namespace Zat.Commander
             }
 
             nextUpdate = Time.time + UpdateInterval;
-        }
-
-        private UnityEngine.Color Lerp3(UnityEngine.Color a, UnityEngine.Color b, UnityEngine.Color c, float t)
-        {
-            if (t < 0.5f)
-                return UnityEngine.Color.Lerp(a, b, t * 2f);
-            else
-                return UnityEngine.Color.Lerp(b, c, (t - 0.5f) * 2f);
         }
 
         public void RegisterClick()

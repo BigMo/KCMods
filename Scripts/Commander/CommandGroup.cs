@@ -17,9 +17,21 @@ namespace Zat.Commander
         public IEnumerable<UnitSystem.Army> Armies { get { return armies; } }
         public IEnumerable<Guid> Guids { get { return armies.Select(a => a.guid); } }
         public IEnumerable<Vector3> Positions { get { return armies.Select(u => u.generalPos); } }
-        public float MaxHealth { get { return armies.Sum(a => a.MaxHealth()); } }
-        public float CurrHealth { get { return armies.Sum(a => a.CurrHealth()); } }
-        public float Health { get { return HasArmies ? (CurrHealth / MaxHealth) : 0; } }
+        public float Health
+        {
+            get
+            {
+                if (!HasArmies) return 0f;
+                int min = 0, max = 0, totalMax = 0, totalMin = 0;
+                foreach (var army in armies)
+                {
+                    UnitSystem.inst.CalculateMinMaxHealth(army, ref min, ref max);
+                    totalMin += min;
+                    totalMax += max;
+                }
+                return (float)totalMin / (float)totalMax;
+            }
+        }
         public float Count { get { return armies.Length; } }
         public GroupType Type
         {
@@ -75,11 +87,27 @@ namespace Zat.Commander
         }
         public void Select()
         {
-            if (!HasArmies) return;
-            var selectedObjs = GameUI.inst?.GetField<List<ISelectable>>("selectedObjs");
-            if (selectedObjs == null) return;
-            selectedObjs.Clear();
-            foreach (var army in armies) GameUI.inst.AddToSelected(army);
+            try
+            {
+                if (!HasArmies) return;
+                Debugging.Log("CommandGroup", $"Selecting {armies.Length} armies");
+                var highlightedObjs = GameUI.inst?.GetField<List<ISelectable>>("highlightedObjs");
+                if (highlightedObjs == null) return;
+                highlightedObjs.Clear();
+                highlightedObjs.AddRange(armies);
+                var selectedObjs = GameUI.inst?.GetField<List<ISelectable>>("selectedObjs");
+                if (selectedObjs == null) return;
+                selectedObjs.Clear();
+                foreach (var army in armies) GameUI.inst.AddToSelected(army);
+                GameUI.inst.CallMethod("SelectCell", null, true, false);
+                GameUI.inst.generalLargeUI.SetSelectedArmy(armies[0]);
+                GameUI.inst.generalLargeUI.gameObject.SetActive(true);
+            }
+            catch (Exception ex)
+            {
+                Debugging.Log("CommandGroup", $"Failed to select armies: {ex.Message}");
+                Debugging.Log("CommandGroup", ex.StackTrace);
+            }
         }
         public void MoveCamera()
         {
