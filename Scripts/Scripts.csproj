@@ -260,6 +260,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commander\CommandEntry.cs" />
+    <Compile Include="Commander\CommanderUI.cs" />
+    <Compile Include="Commander\CommandGroup.cs" />
+    <Compile Include="Commander\Loader.cs" />
     <Compile Include="Minimap\Loader.cs" />
     <Compile Include="Minimap\Minimap.cs" />
     <Compile Include="Minimap\MinimapSettings.cs" />
