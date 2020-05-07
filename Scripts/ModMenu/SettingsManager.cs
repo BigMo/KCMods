@@ -6,6 +6,7 @@ using UnityEngine.Events;
 using Zat.Shared.ModMenu.API;
 using Zat.ModMenu.UI.Entries;
 using Zat.ModMenu.UI.Handlers;
+using Zat.Shared;
 
 namespace Zat.ModMenu
 {
@@ -97,7 +98,7 @@ namespace Zat.ModMenu
                     if (!category) continue;
                     category.UpdateLayout();
                 }
-                Loader.Helper.Log($"[ModMenu] Registered \"{config.ToString()}\"");
+                Debugging.Log("SettingsManager", $"Registered \"{config.ToString()}\"");
 
                 foreach (var topLevelCategory in TopLevelCategories)
                 {
@@ -113,8 +114,8 @@ namespace Zat.ModMenu
             }
             catch (Exception ex)
             {
-                Loader.Helper.Log($"Failed to register mod {config.ToString()}: {ex.Message}");
-                Loader.Helper.Log(ex.StackTrace);
+                Debugging.Log("SettingsManager", $"Failed to register mod {config.ToString()}: {ex.Message}");
+                Debugging.Log("SettingsManager", ex.StackTrace);
                 throw ex;
             }
             finally

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Zat.Shared;
 
 namespace Zat.ModMenu.UI
 {
@@ -18,7 +19,7 @@ namespace Zat.ModMenu.UI
             image = transform.Find("Background/Checkmark")?.GetComponent<UnityEngine.UI.Image>();
             imageOn = Loader.Assets.GetSprite("assets/workspace/ModMenu/minus.png");
             imageOff = Loader.Assets.GetSprite("assets/workspace/ModMenu/plus.png");
-            if (imageOn == null) Loader.Helper.Log("Missing sprite!");
+            if (imageOn == null) Debugging.Log("CategoryToggle", "Missing sprite!");
             if (toggle)
             {
                 if (toggle.onValueChanged == null) toggle.onValueChanged = new UnityEngine.UI.Toggle.ToggleEvent();

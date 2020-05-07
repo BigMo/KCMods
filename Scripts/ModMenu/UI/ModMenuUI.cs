@@ -37,6 +37,11 @@ namespace Zat.ModMenu.UI
         public UnityEngine.UI.Button.ButtonClickedEvent OnCollapseExpandClick { get { return collapseExpand?.onClick; } }
         public UnityEngine.UI.Button.ButtonClickedEvent OnResetClick { get { return reset?.onClick; } }
         public UnityEngine.UI.Button.ButtonClickedEvent OnSaveClick { get { return save?.onClick; } }
+        public bool MenuVisible
+        {
+            get { return ui?.activeSelf ?? false; }
+            set { if (ui) ui.SetActive(value); }
+        }
 
         public void Start()
         {
