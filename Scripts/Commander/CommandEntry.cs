@@ -104,7 +104,6 @@ namespace Zat.Commander
                 designationText.text = designation.ToString();
                 designationText.alignment = TextAlignmentOptions.TopLeft;
                 count.alignment = TextAlignmentOptions.BottomRight;
-                Debugging.Log("CommandEntry", "Initialized");
             }
             catch(Exception ex)
             {
@@ -169,7 +168,6 @@ namespace Zat.Commander
         public void RegisterClick()
         {
             numClicks++;
-            Debugging.Log("CommandEntry", $"RegisterClick {numClicks}");
             lastClick = Time.time;
         }
     }

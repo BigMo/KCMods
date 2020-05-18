@@ -90,16 +90,16 @@ namespace Zat.Commander
             try
             {
                 if (!HasArmies) return;
-                Debugging.Log("CommandGroup", $"Selecting {armies.Length} armies");
                 var highlightedObjs = GameUI.inst?.GetField<List<ISelectable>>("highlightedObjs");
                 if (highlightedObjs == null) return;
                 highlightedObjs.Clear();
-                highlightedObjs.AddRange(armies);
+                //highlightedObjs.AddRange(armies);
                 var selectedObjs = GameUI.inst?.GetField<List<ISelectable>>("selectedObjs");
                 if (selectedObjs == null) return;
                 selectedObjs.Clear();
                 foreach (var army in armies) GameUI.inst.AddToSelected(army);
                 GameUI.inst.CallMethod("SelectCell", null, true, false);
+                GameUI.inst.CallMethod("CalculateFormationOffsets");
                 GameUI.inst.generalLargeUI.SetSelectedArmy(armies[0]);
                 GameUI.inst.generalLargeUI.gameObject.SetActive(true);
             }
@@ -111,7 +111,6 @@ namespace Zat.Commander
         }
         public void MoveCamera()
         {
-            Debugging.Log("CommandGroup", "MoveCamera");
             if (!HasArmies) return;
             var positions = Positions.ToArray();
             var positionsArr = new ArrayExt<Vector3>(positions.Length);

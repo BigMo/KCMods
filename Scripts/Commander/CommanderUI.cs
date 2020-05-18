@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +14,7 @@ namespace Zat.Commander
     public class CommanderUI : MonoBehaviour
     {
         public static bool Instantiated { get { return go != null; } }
+        public static CommanderUI Instance { get; private set; }
         private static GameObject go;
 
         private GameObject groupContainer;
@@ -50,6 +53,7 @@ namespace Zat.Commander
         public void Start()
         {
             if (Instantiated) return;
+            Instance = this;
             go = gameObject;
 
             window = transform.Find("CommanderWindow")?.gameObject;
@@ -71,10 +75,14 @@ namespace Zat.Commander
                 entry.Group = CommandGroup.Empty;
                 entry.Designation = (i + 1);
                 entry.Visible = false;
-                entry.OnGroupEmpty.AddListener(() => ClearGroup(entry));
+                entry.OnGroupEmpty.AddListener(() => {
+                    ClearGroup(entry);
+                    SaveSlots();
+                });
                 entryObj.transform.SetParent(groupContainer.transform, false);
             }
             noneObject.gameObject.SetActive(true);
+            LoadSlots();
         }
 
         private void ClearGroup(CommandEntry entry)
@@ -94,20 +102,18 @@ namespace Zat.Commander
                 {
                     if (Input.GetKeyDown(numbers[i]))
                     {
-                        Debugging.Log("CommanderUI", $"Num{(i + 1)} pressed");
                         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
                         {
-                            Debugging.Log("CommanderUI", $"CTRL pressed");
                             var selectedArmies = SelectedArmies.ToArray();
-                            Debugging.Log("CommanderUI", $"Armies: {selectedArmies.Length}");
                             var group = new CommandGroup(selectedArmies);
                             entries[i].Group = group;
                             entries[i].Visible = group.HasArmies;
-                            Debugging.Log("CommanderUI", $"Visible: {entries[i].Visible}");
+                            SaveSlots();
                         }
                         else if (Input.GetKey(KeyCode.Delete))
                         {
                             ClearGroup(entries[i]);
+                            SaveSlots();
                         }
                         else
                         {
@@ -122,6 +128,44 @@ namespace Zat.Commander
                 Debugging.Log("CommanderUI", $"Error: {ex.Message}");
                 Debugging.Log("CommanderUI", ex.StackTrace);
             }
+        }
+
+        private static string SaveSlotsName { get { return TownNameUI.inst?.townName != null ? $"CommanderSlots-{TownNameUI.inst?.townName}" : null; } }
+        private CommandEntrySaveSlot[] SavedSlots
+        {
+            get
+            {
+                if (SaveSlotsName == null || !PlayerPrefs.HasKey(SaveSlotsName)) return new CommandEntrySaveSlot[0];
+                return JsonConvert.DeserializeObject<CommandEntrySaveSlot[]>(PlayerPrefs.GetString(SaveSlotsName));
+            }
+        }
+        private void SaveSlots()
+        {
+            var slots = Enumerable.Range(0, 9)
+                .Where(i => entries[i] != null && entries[i].Visible)
+                .Select(i => new CommandEntrySaveSlot() { slot = i, armies = entries[i].Group.Guids.ToArray() });
+            PlayerPrefs.SetString(SaveSlotsName, JsonConvert.SerializeObject(slots));
+        }
+        public void LoadSlots()
+        {
+            Debugging.Log("CommanderUI", $"Loading slots, prefsname: \"{SaveSlotsName ?? "null"}\"");
+            var slots = SavedSlots;
+            Debugging.Log("CommanderUI", $"Restoring Slots: {slots.Length}");
+            foreach (var entry in entries) ClearGroup(entry);
+            foreach (var slot in slots)
+            {
+                var armies = PlayerArmies.Where(pa => slot.armies.Contains(pa.guid)).ToArray();
+                var group = new CommandGroup(armies);
+                entries[slot.slot].Group = group;
+                entries[slot.slot].Visible = group.HasArmies;
+            }
+            noneObject.SetActive(!entries.Any(e => e.Visible));
+        }
+
+        private class CommandEntrySaveSlot
+        {
+            public int slot;
+            public Guid[] armies;
         }
     }
 }

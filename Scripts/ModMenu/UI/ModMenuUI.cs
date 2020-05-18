@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Zat.Shared.UI.Utilities;
 using Zat.Shared;
 using Zat.Shared.ModMenu.Interactive;
+using System.Collections.Generic;
 
 namespace Zat.ModMenu.UI
 {
@@ -42,6 +43,8 @@ namespace Zat.ModMenu.UI
             get { return ui?.activeSelf ?? false; }
             set { if (ui) ui.SetActive(value); }
         }
+        public IEnumerable<ModConfig> Configs { get { return settingsManager.Mods; } }
+        public string[] Authors { get { return Configs.Select(m => m.author).Distinct().ToArray(); } }
 
         public void Start()
         {
@@ -187,6 +190,8 @@ namespace Zat.ModMenu.UI
                 UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
                 if (noMods != null) noMods.SetActive(!settingsManager.Mods.Any());
                 SetCollapseExpand(false);
+                if (Loader.CreditsPatch.CreditsNames != null)
+                    Loader.CreditsPatch.CreditsNames.text = string.Join(", ", Authors);
             }
             catch(Exception ex)
             {

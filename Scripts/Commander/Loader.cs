@@ -59,8 +59,28 @@ namespace Zat.Commander
         void PreScriptLoad(KCModHelper kcModHelper)
         {
             //Load up Harmony
-            var harmony = HarmonyInstance.Create("MinimapLoader");
+            var harmony = HarmonyInstance.Create("Commander");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
+        }
+
+        [HarmonyPatch(typeof(PlayingMode))]
+        [HarmonyPatch("Init")]
+        public static class PlayingModePatch
+        {
+            static void Postfix(PlayingMode __instance)
+            {
+                try
+                {
+                    if (!CommanderUI.Instantiated) throw new Exception("CommanderUI not initialized");
+
+                    CommanderUI.Instance.LoadSlots();              
+                }
+                catch (Exception ex)
+                {
+                    Debugging.Log("PlayingModePatch", $"Failed to patch: {ex.Message}");
+                    Debugging.Log("PlayingModePatch", ex.StackTrace);
+                }
+            }
         }
     }
 }

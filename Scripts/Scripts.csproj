@@ -296,6 +296,7 @@
     <Compile Include="Productivity\Loader.cs" />
     <Compile Include="Productivity\ProductivitySettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shared\Zat.GameUtils.cs" />
     <Compile Include="Shared\Zat.InterModComm.cs" />
     <Compile Include="Shared\Zat.ModMenu.API.cs" />
     <Compile Include="Shared\Zat.Reflection.cs" />
