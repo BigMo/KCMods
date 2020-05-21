@@ -8,8 +8,8 @@ namespace Zat.Shared.AssetLoading
     /// </summary>
     public class AssetManager
     {
-        private AssetBundle assetBundle;
-        private Dictionary<string, UnityEngine.Object> assets;
+        private readonly AssetBundle assetBundle;
+        private readonly Dictionary<string, UnityEngine.Object> assets;
         public bool BundleLoaded { get { return assetBundle != null; } }
 
         /// <summary>

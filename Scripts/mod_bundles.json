@@ -1,0 +1,44 @@
+﻿[
+  {
+    "sourceDirectory": ".\\Commander",
+    "bundleName": "Commander",
+    "assetBundleSource": "..\\Unity Project\\Assets\\Workspace",
+    "assetBundleName": "commander001",
+    "targetDirectory": "CommanderBundle",
+    "dependencies": [
+      "Zat.Shared"
+    ],
+    "deploy": true
+  },
+  {
+    "sourceDirectory": ".\\Minimap",
+    "bundleName": "Minimap",
+    "assetBundleSource": "..\\Unity Project\\Assets\\Workspace",
+    "assetBundleName": "minimap002",
+    "targetDirectory": "MinimapBundle",
+    "dependencies": [
+      "Zat.Shared"
+    ],
+    "deploy": true
+  },
+  {
+    "sourceDirectory": ".\\ModMenu",
+    "bundleName": "ModMenu",
+    "assetBundleSource": "..\\Unity Project\\Assets\\Workspace",
+    "assetBundleName": "modmenu002",
+    "targetDirectory": "ModMenuBundle",
+    "dependencies": [
+      "Zat.Shared"
+    ],
+    "excludePatterns": [
+      "DummyMod\\.cs"
+    ],
+    "deploy": true
+  },
+  {
+    "sourceDirectory": ".\\Shared",
+    "bundleName": "Zat.Shared",
+    "deploy": false,
+    "minify":  true
+  }
+]

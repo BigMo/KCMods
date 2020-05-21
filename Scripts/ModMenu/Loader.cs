@@ -58,7 +58,7 @@ namespace Zat.ModMenu
 
         [HarmonyPatch(typeof(MainMenuMode))]
         [HarmonyPatch("Init")]
-        public static class MainMenuModePatch
+        internal static class MainMenuModePatch
         {
             private static bool once = true;
             static void Postfix(MainMenuMode __instance)
@@ -128,7 +128,7 @@ namespace Zat.ModMenu
 
         [HarmonyPatch(typeof(CreditsUI))]
         [HarmonyPatch("OnEnable")]
-        public static class CreditsPatch
+        internal static class CreditsPatch
         {
             public static TextMeshProUGUI CreditsNames { get; private set; }
             static void Postfix(CreditsUI __instance)

@@ -16,9 +16,8 @@ namespace Zat.Minimap
 {
     class Minimap : MonoBehaviour
     {
-        private Vector2 mapPosition, mapSize;
         private float nextUpdate;
-        
+
         private RenderTexture tex;
         private Camera renderCam;
         private static GameObject go;
@@ -35,15 +34,9 @@ namespace Zat.Minimap
 
         private Vector2 WorldSize { get { return new Vector2(World.inst?.GetField<int>("gridWidth") ?? 0, World.inst?.GetField<int>("gridHeight") ?? 0); } }
         private Vector2 CamPosition { get { return new Vector2(Cam.inst?.TrackingPos.x ?? 0, Cam.inst?.TrackingPos.z ?? 0); } }
-        private float CameraZoom
+
+        private Vector2 Scroll
         {
-            get
-            {
-                if (!Cam.inst) return 0;
-                return 1f - (Cam.inst.dist - Cam.inst.zoomRange.Min) / (Cam.inst.zoomRange.Max - Cam.inst.zoomRange.Min);
-            }
-        }
-        private Vector2 Scroll {
             get
             {
                 var mapSize = WorldSize;
@@ -101,7 +94,7 @@ namespace Zat.Minimap
             }
         }
 
-        private UnitIndicatorPool pool = new UnitIndicatorPool();
+        private readonly UnitIndicatorPool pool = new UnitIndicatorPool();
 
         private MinimapSettings settings;
         private bool showFullscreen = false;
@@ -155,8 +148,6 @@ namespace Zat.Minimap
                 mapImage.texture = tex;
 
 
-                Debugging.Active = true;
-                Debugging.Helper = Loader.Helper;
                 var config = new InteractiveConfiguration<MinimapSettings>();
                 settings = config.Settings;
                 ModSettingsBootstrapper.Register(config.ModConfig, (proxy, saved) =>
@@ -165,14 +156,14 @@ namespace Zat.Minimap
                     OnModRegistered(proxy, saved);
                 }, (ex) =>
                 {
-                    Loader.Helper.Log($"Failed to register mod: {ex.Message}");
-                    Loader.Helper.Log(ex.StackTrace);
+                    Debugging.Log("Minimap", $"Failed to register mod: {ex.Message}");
+                    Debugging.Log("Minimap", ex.StackTrace);
                 });
             }
             catch (Exception ex)
             {
-                Loader.Helper.Log(ex.Message);
-                Loader.Helper.Log(ex.StackTrace);
+                Debugging.Log("Minimap", ex.Message);
+                Debugging.Log("Minimap", ex.StackTrace);
             }
         }
 
@@ -194,7 +185,7 @@ namespace Zat.Minimap
                 Cam.inst?.SetDesiredTrackingPos(new Vector3(target.x, 0, target.y));
             }
         }
-        
+
         private void SetSize(float size)
         {
             header.sizeDelta = new Vector2(size + 10, header.sizeDelta.y);
@@ -223,7 +214,7 @@ namespace Zat.Minimap
                 this.proxy = proxy;
                 if (!proxy)
                 {
-                    Loader.Helper.Log("Failed to register proxy!");
+                    Debugging.Log("Minimap", "Failed to register proxy!");
                     return;
                 }
 
@@ -272,19 +263,19 @@ namespace Zat.Minimap
                     settings.Visual.PositionY.Value
                 );
 
-                Loader.Helper.Log("OnRegisterMod finished");
+                Debugging.Log("Minimap", "OnRegisterMod finished");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Loader.Helper.Log($"OnRegisterMod failed: {ex.Message}");
-                Loader.Helper.Log(ex.StackTrace);
+                Debugging.Log("Minimap", $"OnRegisterMod failed: {ex.Message}");
+                Debugging.Log("Minimap", ex.StackTrace);
             }
         }
 
         private void SetupResponsiveIndicatorEntry(IndicatorEntry entry)
         {
             entry.Enabled.OnUpdate.AddListener((setting) => entry.Enabled.Label = setting.toggle.value ? "Visible" : "Hidden");
-            entry.Size.OnUpdate.AddListener((setting) => entry.Size.Label = $"Size: {(int)setting.slider.value}px" );
+            entry.Size.OnUpdate.AddListener((setting) => entry.Size.Label = $"Size: {(int)setting.slider.value}px");
 
             entry.Enabled.TriggerUpdate();
             entry.Color.TriggerUpdate();
@@ -304,12 +295,13 @@ namespace Zat.Minimap
             try
             {
                 UpdateIndicators();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 if (Input.GetKey(KeyCode.I))
                 {
-                    Loader.Helper.Log(ex.Message);
-                    Loader.Helper.Log(ex.StackTrace);
+                    Debugging.Log("Minimap", ex.Message);
+                    Debugging.Log("Minimap", ex.StackTrace);
                 }
             }
         }
@@ -377,7 +369,7 @@ namespace Zat.Minimap
         private void UpdateArrow()
         {
             if (settings == null) return;
-            var newPos = (Vector2.one * settings.Visual.Size) * (Scroll * new Vector2(1,-1));
+            var newPos = (Vector2.one * settings.Visual.Size) * (Scroll * new Vector2(1, -1));
             arrowBody.anchoredPosition = newPos;
             arrowBody.rotation = Quaternion.Euler(0, 0, -CamRotation - 270);
         }

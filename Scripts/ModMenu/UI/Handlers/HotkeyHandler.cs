@@ -15,7 +15,8 @@ namespace Zat.ModMenu.UI.Handlers
             var button = go.AddComponent<HotkeyEntry>();
             button.Setup();
             AssignValue(button, data);
-            button.OnKeyChanged.AddListener((key) => {
+            button.OnKeyChanged.AddListener((key) =>
+            {
                 data.hotkey = key;
                 onUpdate();
             });

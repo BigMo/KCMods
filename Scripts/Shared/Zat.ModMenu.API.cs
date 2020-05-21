@@ -147,7 +147,7 @@ namespace Zat.Shared.ModMenu.API
         /// ModConfig associated with this proxy, mirrors the state of the config in the central ModMenu
         /// </summary>
         public ModConfig Config;
-        private Dictionary<string, SettingsChangedEvent> settingsEvents = new Dictionary<string, SettingsChangedEvent>();
+        private readonly Dictionary<string, SettingsChangedEvent> settingsEvents = new Dictionary<string, SettingsChangedEvent>();
         private ResetIssuedEvent resetIssuedEvent = new ResetIssuedEvent();
 
         /// <summary>
@@ -217,8 +217,8 @@ namespace Zat.Shared.ModMenu.API
     [Obsolete("Will be removed shortly; migrate to using InteractiveSettings")]
     public class ModConfigBuilder
     {
-        private ModConfig config;
-        private List<SettingsEntry> settings;
+        private readonly ModConfig config;
+        private readonly List<SettingsEntry> settings;
 
         private ModConfigBuilder(string name, string version, string author)
         {
@@ -921,7 +921,7 @@ namespace Zat.Shared.ModMenu.Interactive
             }
         }
         public override EntryType Type { get { return EntryType.Slider; } }
-        private SliderAttribute defaultValues;
+        private readonly SliderAttribute defaultValues;
         public InteractiveSliderSetting(SettingsEntry entry, SliderAttribute values) : base(entry)
         {
             defaultValues = values;
@@ -996,7 +996,7 @@ namespace Zat.Shared.ModMenu.Interactive
                 OnLocalUpdate?.Invoke(Setting);
             }
         }
-        private ToggleAttribute defaultValues;
+        private readonly ToggleAttribute defaultValues;
         public InteractiveToggleSetting(SettingsEntry entry, ToggleAttribute values) : base(entry)
         {
             defaultValues = values;
@@ -1068,7 +1068,7 @@ namespace Zat.Shared.ModMenu.Interactive
                 OnLocalUpdate?.Invoke(Setting);
             }
         }
-        private SelectAttribute defaultValues;
+        private readonly SelectAttribute defaultValues;
         public InteractiveSelectSetting(SettingsEntry entry, SelectAttribute values) : base(entry)
         {
             defaultValues = values;
@@ -1134,7 +1134,7 @@ namespace Zat.Shared.ModMenu.Interactive
                 OnLocalUpdate?.Invoke(Setting);
             }
         }
-        private ColorAttribute defaultValues;
+        private readonly ColorAttribute defaultValues;
         public InteractiveColorSetting(SettingsEntry entry, ColorAttribute values) : base(entry)
         {
             defaultValues = values;
@@ -1233,7 +1233,7 @@ namespace Zat.Shared.ModMenu.Interactive
                 OnLocalUpdate?.Invoke(Setting);
             }
         }
-        private HotkeyAttribute defaultValues;
+        private readonly HotkeyAttribute defaultValues;
         public InteractiveHotkeySetting(SettingsEntry entry, HotkeyAttribute values) : base(entry)
         {
             defaultValues = values;
@@ -1286,7 +1286,7 @@ namespace Zat.Shared.ModMenu.Interactive
     }
     public class InteractiveButtonSetting : InteractiveSetting
     {
-        private ButtonAttribute defaultValues;
+        private readonly ButtonAttribute defaultValues;
         private ButtonState previousState;
         public string Label
         {

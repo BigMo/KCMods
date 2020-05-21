@@ -8,7 +8,7 @@ namespace Zat.ModMenu.UI.Handlers
 {
     public class EntryHandler : IEntryHandler
     {
-        private Dictionary<EntryType, IEntryHandler> handlers;
+        private readonly Dictionary<EntryType, IEntryHandler> handlers;
 
         public static EntryHandler Instance { get { return instance ?? (instance = new EntryHandler()); } }
         private static EntryHandler instance;

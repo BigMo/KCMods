@@ -8,7 +8,7 @@ namespace Zat.ModMenu.UI.Handlers
 {
     public class SliderHandler : IEntryHandler
     {
-        private GameObject prefab;
+        private readonly GameObject prefab;
 
         public BaseEntry CreateEntry(SettingsEntry data, UnityAction onUpdate)
         {

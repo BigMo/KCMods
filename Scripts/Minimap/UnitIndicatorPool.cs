@@ -4,7 +4,7 @@ namespace Zat.Minimap
 {
     internal class UnitIndicatorPool
     {
-        private ArrayExt<UnitIndicator> indicators = new ArrayExt<UnitIndicator>(100);
+        private readonly ArrayExt<UnitIndicator> indicators = new ArrayExt<UnitIndicator>(100);
         private int currentIndex = 0, lastIndex = 0;
         public int Indicators { get { return currentIndex; } }
         public Transform parent;
@@ -35,7 +35,7 @@ namespace Zat.Minimap
         public void End()
         {
             var diff = currentIndex - lastIndex;
-            
+
             if (lastIndex > currentIndex)
             {
                 for (var i = currentIndex; i < lastIndex && i < indicators.Count; i++)

@@ -12,7 +12,7 @@ namespace Zat.ModMenu.UI
         private UnityEngine.UI.Image image;
 
         public Sprite imageOn, imageOff;
-        
+
         public void Start()
         {
             toggle = GetComponent<UnityEngine.UI.Toggle>();

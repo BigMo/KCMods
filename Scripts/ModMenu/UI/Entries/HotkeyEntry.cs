@@ -9,10 +9,10 @@ namespace Zat.ModMenu.UI.Entries
     public class HotkeyEntry : BaseEntry
     {
         public class KeyEvent : UnityEvent<Hotkey> { }
-        
+
         private UnityEngine.UI.Button button;
         private TextMeshProUGUI label;
-        private KeyEvent keyChanged = new KeyEvent();
+        private readonly KeyEvent keyChanged = new KeyEvent();
         public bool recordKeys = false;
 
         private static readonly KeyCode[] KEYS = (KeyCode[])Enum.GetValues(typeof(KeyCode));
@@ -29,7 +29,8 @@ namespace Zat.ModMenu.UI.Entries
         public Hotkey Hotkey
         {
             get { return hotkey; }
-            set {
+            set
+            {
                 //if (hotkey == null || hotkey.UpdateableFrom(value))
                 {
                     hotkey = value;
@@ -69,7 +70,7 @@ namespace Zat.ModMenu.UI.Entries
             {
                 Hotkey hotkey = new Hotkey();
                 bool any = false;
-                foreach(var key in KEYS)
+                foreach (var key in KEYS)
                 {
                     if (Input.GetKey(key))
                     {

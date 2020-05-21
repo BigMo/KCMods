@@ -10,7 +10,7 @@ namespace Zat.ModMenu.UI.Entries
         private TextMeshProUGUI labelA, labelR, labelB, labelG;
         private ColorChangeEvent colorChange;
         public class ColorChangeEvent : UnityEvent<Zat.Shared.ModMenu.API.Color> { }
-        
+
         public Zat.Shared.ModMenu.API.Color Color
         {
             get
@@ -46,7 +46,7 @@ namespace Zat.ModMenu.UI.Entries
         {
             get { return colorChange; }
         }
-        
+
         protected override void RetrieveControls()
         {
             base.RetrieveControls();

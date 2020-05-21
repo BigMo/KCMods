@@ -21,7 +21,7 @@ namespace Zat.Commander
         private GameObject noneObject;
         private GameObject window;
         private CommandEntry[] entries;
-        private KeyCode[] numbers = new KeyCode[] {
+        private readonly KeyCode[] numbers = new KeyCode[] {
             KeyCode.Keypad1, KeyCode.Keypad2, KeyCode.Keypad3,
             KeyCode.Keypad4, KeyCode.Keypad5, KeyCode.Keypad6,
             KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad9
@@ -75,7 +75,8 @@ namespace Zat.Commander
                 entry.Group = CommandGroup.Empty;
                 entry.Designation = (i + 1);
                 entry.Visible = false;
-                entry.OnGroupEmpty.AddListener(() => {
+                entry.OnGroupEmpty.AddListener(() =>
+                {
                     ClearGroup(entry);
                     SaveSlots();
                 });
@@ -123,7 +124,7 @@ namespace Zat.Commander
                 }
                 noneObject.SetActive(!entries.Any(e => e.Visible));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debugging.Log("CommanderUI", $"Error: {ex.Message}");
                 Debugging.Log("CommanderUI", ex.StackTrace);

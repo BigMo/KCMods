@@ -56,10 +56,10 @@ namespace Zat.ModMenu
             }
         }
 
-        private List<SettingContext> settings;
-        private List<ModContext> mods;
-        private GameObject container;
-        private UnityAction<SettingsEntry> onUpdate;
+        private readonly List<SettingContext> settings;
+        private readonly List<ModContext> mods;
+        private readonly GameObject container;
+        private readonly UnityAction<SettingsEntry> onUpdate;
 
         public SettingsManager(GameObject container, UnityAction<SettingsEntry> onUpdate)
         {

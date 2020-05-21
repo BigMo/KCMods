@@ -15,7 +15,7 @@ namespace Zat.Productivity
      * You can put categories into categories and settings into categories as you like.
      */
 
-    [Mod("Productivity", "v0.1","Zat")]
+    [Mod("Productivity", "v0.1", "Zat")]
     public class ProductivitySettings
     {
 

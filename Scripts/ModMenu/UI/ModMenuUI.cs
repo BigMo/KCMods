@@ -193,7 +193,7 @@ namespace Zat.ModMenu.UI
                 if (Loader.CreditsPatch.CreditsNames != null)
                     Loader.CreditsPatch.CreditsNames.text = string.Join(", ", Authors);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debugging.Log("ModMenu", $"Failed to register mod: {ex}");
                 Debugging.Log("ModMenu", ex.StackTrace);
@@ -245,7 +245,7 @@ namespace Zat.ModMenu.UI
                 }
                 handler.SendResponse(port.gameObject.name);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debugging.Log("ModMenu", $"Failed to process update: {ex.Message}");
                 Debugging.Log("ModMenu", ex.StackTrace);

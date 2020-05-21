@@ -15,10 +15,10 @@ namespace Zat.Shared.InterModComm
     /// </summary>
     public class IMCPort : MonoBehaviour
     {
-        private Component component;
+        private readonly Component component;
         private List<IMCWait> pendingResponses = new List<IMCWait>();
-        private Dictionary<string, UnityAction<IRequestHandler, IMCMessage>> receiveListeners = new Dictionary<string, UnityAction<IRequestHandler, IMCMessage>>();
-        private Dictionary<string, Component> ports = new Dictionary<string, Component>();
+        private readonly Dictionary<string, UnityAction<IRequestHandler, IMCMessage>> receiveListeners = new Dictionary<string, UnityAction<IRequestHandler, IMCMessage>>();
+        private readonly Dictionary<string, Component> ports = new Dictionary<string, Component>();
 
         private class RequestEvent : UnityEvent<IRequestHandler> { }
         public void Update()
@@ -294,7 +294,7 @@ namespace Zat.Shared.InterModComm
     }
     class IMCRequestHandler : IRequestHandler
     {
-        private IMCMessage message;
+        private readonly IMCMessage message;
         public IMCMessage Response { get; private set; }
 
         public IMCRequestHandler(IMCMessage message)

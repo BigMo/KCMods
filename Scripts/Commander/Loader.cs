@@ -73,7 +73,7 @@ namespace Zat.Commander
                 {
                     if (!CommanderUI.Instantiated) throw new Exception("CommanderUI not initialized");
 
-                    CommanderUI.Instance.LoadSlots();              
+                    CommanderUI.Instance.LoadSlots();
                 }
                 catch (Exception ex)
                 {

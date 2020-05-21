@@ -14,5 +14,7 @@ namespace Bundling
         public string assetBundleName;
         public string[] dependencies;
         public string[] excludePatterns;
+        public bool deploy;
+        public bool minify;
     }
 }

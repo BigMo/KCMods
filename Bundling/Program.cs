@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,19 +18,23 @@ namespace Bundling
 
             if (args.Length != 1)
             {
-                Console.WriteLine("Usage: Bundling <bundlename>");
+                Debug.WriteLine("Usage: Bundling <bundlename>");
                 return;
             }
 
             try
             {
                 var bundles = new ModBundleManager(definitionsFile);
-                bundles.Bundle(bundles.GetModBundleDefinition(args[0]));
-                Console.WriteLine("Done!");
+                if (args[0] == "--all")
+                    bundles.BundleAll();
+                else
+                    bundles.Bundle(bundles.GetModBundleDefinition(args[0]));
+
+                Debug.WriteLine("Done!");
             }
             catch(FileNotFoundException)
             {
-                Console.WriteLine("No definitions found; creating example file");
+                Debug.WriteLine("No definitions found; creating example file");
                 ModBundleManager.CreateSampleFile(definitionsFile);
             }
             catch(Exception ex)
@@ -40,10 +45,10 @@ namespace Bundling
 
         private static void PrintExceptionRecursive(Exception ex)
         {
-            Console.WriteLine("-".PadRight(20, '-'));
-            Console.WriteLine(ex.Message);
-            Console.WriteLine("-".PadRight(20, '-'));
-            Console.WriteLine(ex.StackTrace);
+            Debug.WriteLine("-".PadRight(20, '-'));
+            Debug.WriteLine(ex.Message);
+            Debug.WriteLine("-".PadRight(20, '-'));
+            Debug.WriteLine(ex.StackTrace);
             if (ex.InnerException != null) PrintExceptionRecursive(ex.InnerException);
         }
     }

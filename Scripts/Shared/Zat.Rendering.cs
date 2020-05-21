@@ -22,7 +22,7 @@ namespace Zat.Shared.Rendering
             }
         }
 
-        private static Dictionary<int, RingArray> ringDict = new Dictionary<int, RingArray>();
+        private static readonly Dictionary<int, RingArray> ringDict = new Dictionary<int, RingArray>();
 
         public static UnityEngine.Color Color
         {

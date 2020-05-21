@@ -27,12 +27,11 @@ namespace Zat.Productivity
             try
             {
                 //Parse config
-                InteractiveSettingsParser.Helper = helper;
-                var config = InteractiveSettingsParser.Parse<ProductivitySettings>();
+                var config = new Zat.Shared.ModMenu.Interactive.InteractiveConfiguration<ProductivitySettings>();
                 Settings = config.Settings;
 
-                Shared.ModMenu.API.ModSettingsProxy.Helper = helper;
-                Shared.InterModComm.IMCPort.helper = helper;
+                Zat.Shared.Debugging.Active = true;
+                Zat.Shared.Debugging.Helper = helper;
 
                 Shared.ModMenu.API.ModSettingsBootstrapper.Register(config.ModConfig,
                     (proxy, oldSettings) => config.Install(proxy, oldSettings),

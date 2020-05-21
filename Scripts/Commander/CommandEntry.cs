@@ -15,7 +15,7 @@ namespace Zat.Commander
         private TextMeshProUGUI count, designationText;
         private UnityEngine.UI.Image healthColor;
         private UnityEngine.UI.Button button;
-        private UnityEvent onGroupEmpty = new UnityEvent();
+        private readonly UnityEvent onGroupEmpty = new UnityEvent();
         private int designation;
         private float nextUpdate = 1;
         private CommandGroup group;
@@ -77,7 +77,7 @@ namespace Zat.Commander
             set { gameObject.SetActive(value); }
         }
         public float UpdateInterval { get; set; }
-        
+
         public void Init()
         {
             try
@@ -105,7 +105,7 @@ namespace Zat.Commander
                 designationText.alignment = TextAlignmentOptions.TopLeft;
                 count.alignment = TextAlignmentOptions.BottomRight;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debugging.Log("CommanderUI", $"Failed to init CommandEntry: {ex.Message}");
                 Debugging.Log("CommanderUI", ex.StackTrace);
@@ -119,7 +119,7 @@ namespace Zat.Commander
 
                 if (!HasGroup) onGroupEmpty?.Invoke();
                 else if (Time.time > nextUpdate) UpdateUI();
-                
+
                 if (Time.time - lastClick >= 0.3f && numClicks > 0 && HasGroup)
                 {
                     if (numClicks == 1) group.Select();
