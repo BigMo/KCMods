@@ -11,7 +11,7 @@ namespace Zat.Commander
 {
     public class CommandEntry : MonoBehaviour
     {
-        private GameObject iconsSoldier, iconsArcher, iconsMixed, healthBar;
+        private GameObject iconSoldier, iconArcher, iconTransportShip, healthBar;
         private TextMeshProUGUI count, designationText;
         private UnityEngine.UI.Image healthColor;
         private UnityEngine.UI.Button button;
@@ -47,7 +47,7 @@ namespace Zat.Commander
             }
         }
 
-        private bool HasGroup { get { return group?.HasArmies ?? false; } }
+        private bool HasGroup { get { return group?.HasUnits ?? false; } }
 
         public CommandGroup Group
         {
@@ -82,18 +82,18 @@ namespace Zat.Commander
         {
             try
             {
-                iconsSoldier = transform.Find("Icons/Soldier")?.gameObject;
-                iconsArcher = transform.Find("Icons/Archer")?.gameObject;
-                iconsMixed = transform.Find("Icons/Mixed")?.gameObject;
+                iconSoldier = transform.Find("Icons/Soldier")?.gameObject;
+                iconArcher = transform.Find("Icons/Archer")?.gameObject;
+                iconTransportShip = transform.Find("Icons/TroopTransportShip")?.gameObject;
                 count = transform.Find("Count")?.GetComponent<TextMeshProUGUI>();
                 designationText = transform.Find("Number")?.GetComponent<TextMeshProUGUI>();
                 healthBar = transform.Find("Health/Bar")?.gameObject;
                 healthColor = transform.Find("Health/Bar/BarFiller")?.GetComponent<UnityEngine.UI.Image>();
                 button = transform.GetComponent<UnityEngine.UI.Button>();
 
-                if (iconsSoldier == null) Debugging.Log("CommandEntry", $"{nameof(iconsSoldier)} NULL");
-                if (iconsArcher == null) Debugging.Log("CommandEntry", $"{nameof(iconsArcher)} NULL");
-                if (iconsMixed == null) Debugging.Log("CommandEntry", $"{nameof(iconsMixed)} NULL");
+                if (iconSoldier == null) Debugging.Log("CommandEntry", $"{nameof(iconSoldier)} NULL");
+                if (iconArcher == null) Debugging.Log("CommandEntry", $"{nameof(iconArcher)} NULL");
+                if (iconTransportShip == null) Debugging.Log("CommandEntry", $"{nameof(iconTransportShip)} NULL");
                 if (count == null) Debugging.Log("CommandEntry", $"{nameof(count)} NULL");
                 if (designationText == null) Debugging.Log("CommandEntry", $"{nameof(designationText)} NULL");
                 if (healthBar == null) Debugging.Log("CommandEntry", $"{nameof(healthBar)} NULL");
@@ -142,22 +142,42 @@ namespace Zat.Commander
             healthBar.transform.localScale = new Vector3(health, 1, 1);
             healthColor.color = HealthGradient.Evaluate(health);
 
-            iconsSoldier.SetActive(false);
-            iconsArcher.SetActive(false);
-            iconsMixed.SetActive(false);
+            iconSoldier.SetActive(false);
+            iconArcher.SetActive(false);
+            iconTransportShip.SetActive(false);
 
             if (HasGroup)
             {
-                switch (Group.Type)
+                var icons = new List<GameObject>();
+
+                if ((Group.Type & CommandUnit.UnitType.Archer) == CommandUnit.UnitType.Archer) icons.Add(iconArcher);
+                else iconArcher.SetActive(false);
+                if ((Group.Type & CommandUnit.UnitType.Soldier) == CommandUnit.UnitType.Soldier) icons.Add(iconSoldier);
+                else iconSoldier.SetActive(false);
+                if ((Group.Type & CommandUnit.UnitType.TroopTransportShip) == CommandUnit.UnitType.TroopTransportShip) icons.Add(iconTransportShip);
+                else iconTransportShip.SetActive(false);
+
+                foreach (var icon in icons) icon.SetActive(true);
+
+                switch (icons.Count)
                 {
-                    case CommandGroup.GroupType.Soldiers:
-                        iconsSoldier.SetActive(true);
+                    case 3:
+                        icons[0].GetComponent<RectTransform>().anchoredPosition = new Vector3(-12, -12);
+                        icons[0].GetComponent<RectTransform>().sizeDelta = new Vector2(24, 24);
+                        icons[1].GetComponent<RectTransform>().anchoredPosition =new Vector3(0, 0);
+                        icons[1].GetComponent<RectTransform>().sizeDelta = new Vector2(24, 24);
+                        icons[2].GetComponent<RectTransform>().anchoredPosition =new Vector3(12, 12);
+                        icons[2].GetComponent<RectTransform>().sizeDelta = new Vector2(24, 24);
                         break;
-                    case CommandGroup.GroupType.Archers:
-                        iconsArcher.SetActive(true);
+                    case 2:
+                        icons[0].GetComponent<RectTransform>().anchoredPosition =new Vector3(-6, -6);
+                        icons[0].GetComponent<RectTransform>().sizeDelta = new Vector2(36, 36);
+                        icons[1].GetComponent<RectTransform>().anchoredPosition =new Vector3(6, 6);
+                        icons[1].GetComponent<RectTransform>().sizeDelta = new Vector2(36, 36);
                         break;
-                    case CommandGroup.GroupType.Mixed:
-                        iconsMixed.SetActive(true);
+                    case 1:
+                        icons[0].GetComponent<RectTransform>().anchoredPosition =new Vector3(0, 0);
+                        icons[0].GetComponent<RectTransform>().sizeDelta = new Vector2(48, 48);
                         break;
                 }
             }

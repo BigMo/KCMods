@@ -31,10 +31,19 @@ namespace Zat.Commander
         {
             get
             {
-                if (!UnitSystem.inst) return new UnitSystem.Army[0];
+                if (!UnitSystem.inst) return Enumerable.Empty<UnitSystem.Army>();
                 return UnitSystem.inst.GetField<List<UnitSystem.Army>>("armies")
                         .Where(a => a.teamId == 0)
                         .Where(a => a.ValidToSelect());
+            }
+        }
+        private static IEnumerable<ShipBase> PlayerShips
+        {
+            get
+            {
+                if (!ShipSystem.inst || ShipSystem.inst.ships == null || ShipSystem.inst.ships.Count == 0) return Enumerable.Empty<ShipBase>();
+                return ShipSystem.inst.ships
+                    .data.Where(s => s != null && s.teamID == 0);
             }
         }
         private static IEnumerable<ISelectable> SelectedObjects
@@ -49,6 +58,26 @@ namespace Zat.Commander
         {
             get { return SelectedObjects.Where(o => o is UnitSystem.Army).Cast<UnitSystem.Army>(); }
         }
+        private static IEnumerable<ShipBase> SelectedTransportShips
+        {
+            get {
+                return SelectedObjects
+                    .Where(o => o is TroopTransportShip)
+                    .Cast<TroopTransportShip>()
+                    .Select(t => t.GetComponent<ShipBase>())
+                    .Where(s => s.type == ShipBase.ShipType.TroopTransport);
+            }
+        }
+        private static IEnumerable<CommandUnit> SelectedMoveableUnits
+        {
+            get
+            {
+                return SelectedArmies
+                    .Select(a => new CommandUnit(a))
+                    .Concat(SelectedTransportShips.Select(s => new CommandUnit(s)));
+            }
+        }
+
 
         public void Start()
         {
@@ -105,10 +134,10 @@ namespace Zat.Commander
                     {
                         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
                         {
-                            var selectedArmies = SelectedArmies.ToArray();
-                            var group = new CommandGroup(selectedArmies);
+                            var selectedUnits = SelectedMoveableUnits.ToArray();
+                            var group = new CommandGroup(selectedUnits);
                             entries[i].Group = group;
-                            entries[i].Visible = group.HasArmies;
+                            entries[i].Visible = group.HasUnits;
                             SaveSlots();
                         }
                         else if (Input.GetKey(KeyCode.Delete))
@@ -149,18 +178,28 @@ namespace Zat.Commander
         }
         public void LoadSlots()
         {
-            Debugging.Log("CommanderUI", $"Loading slots, prefsname: \"{SaveSlotsName ?? "null"}\"");
-            var slots = SavedSlots;
-            Debugging.Log("CommanderUI", $"Restoring Slots: {slots.Length}");
-            foreach (var entry in entries) ClearGroup(entry);
-            foreach (var slot in slots)
+            try
             {
-                var armies = PlayerArmies.Where(pa => slot.armies.Contains(pa.guid)).ToArray();
-                var group = new CommandGroup(armies);
-                entries[slot.slot].Group = group;
-                entries[slot.slot].Visible = group.HasArmies;
+                Debugging.Log("CommanderUI", $"Loading slots, prefsname: \"{SaveSlotsName ?? "null"}\"");
+                var slots = SavedSlots;
+                Debugging.Log("CommanderUI", $"Restoring Slots: {slots.Length}");
+                foreach (var entry in entries) ClearGroup(entry);
+                foreach (var slot in slots)
+                {
+                    //var armies = PlayerArmies.Where(pa => slot.armies.Contains(pa.guid)).ToArray();
+                    var armies = PlayerArmies.Where(pa => slot.armies.Contains(pa.guid)).Select(a => new CommandUnit(a));
+                    var ships = PlayerShips.Where(ps => slot.armies.Contains(ps.guid)).Select(s => new CommandUnit(s));
+                    var group = new CommandGroup(armies.Concat(ships).ToArray());
+                    entries[slot.slot].Group = group;
+                    entries[slot.slot].Visible = group.HasUnits;
+                }
+                noneObject.SetActive(!entries.Any(e => e.Visible));
             }
-            noneObject.SetActive(!entries.Any(e => e.Visible));
+            catch (Exception ex)
+            {
+                Debugging.Log("CommanderUI", $"Failed to load slots: {ex.Message}");
+                Debugging.Log("CommanderUI", ex.StackTrace);
+            }
         }
 
         private class CommandEntrySaveSlot
