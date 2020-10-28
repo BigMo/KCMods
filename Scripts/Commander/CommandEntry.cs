@@ -118,9 +118,9 @@ namespace Zat.Commander
             {
 
                 if (!HasGroup) onGroupEmpty?.Invoke();
-                else if (Time.time > nextUpdate) UpdateUI();
+                else if (Time.unscaledTime > nextUpdate) UpdateUI();
 
-                if (Time.time - lastClick >= 0.3f && numClicks > 0 && HasGroup)
+                if (Time.unscaledTime - lastClick >= 0.3f && numClicks > 0 && HasGroup)
                 {
                     if (numClicks == 1) group.Select();
                     if (numClicks == 2) group.MoveCamera();
@@ -182,13 +182,13 @@ namespace Zat.Commander
                 }
             }
 
-            nextUpdate = Time.time + UpdateInterval;
+            nextUpdate = Time.unscaledTime + UpdateInterval;
         }
 
         public void RegisterClick()
         {
             numClicks++;
-            lastClick = Time.time;
+            lastClick = Time.unscaledTime;
         }
     }
 }

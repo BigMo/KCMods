@@ -6,6 +6,7 @@ using Harmony;
 using I2.Loc;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Zat.ModMenu.UI;
 using Zat.Shared;
 using Zat.Shared.AssetLoading;
@@ -52,6 +53,7 @@ namespace Zat.ModMenu
             }
             var canvas = GameObject.Instantiate(canvasPrefab) as GameObject;
             //canvas.transform.SetParent(parent, false);
+            canvas.transform.Find("ModSettingsUI").Find("Scroll View").GetComponent<ScrollRect>().scrollSensitivity = 50;
             canvas.AddComponent<ModMenuUI>();
             Debugging.Log("ModMenu", "Running!");
         }
