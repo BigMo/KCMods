@@ -50,6 +50,15 @@ namespace Zat.Commander
                 else if (GameState.inst.playingMode.GameUIParent.transform == null) Debugging.Log("Loader", "GameState.inst.playingMode.GameUIParent.transform NULL");
                 return;
             }
+            
+            if (parent.childCount > 0) {
+                Canvas existingCanvas = parent.GetChild(0).GetComponent<Canvas>();
+                if (existingCanvas != null) {
+                    Canvas canvasCanvas = canvas.GetComponent<Canvas>();
+                    canvasCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+                    canvasCanvas.worldCamera = existingCanvas.worldCamera;
+                }
+            }
             canvas.transform.SetParent(parent, true);
             var commander = canvas.AddComponent<CommanderUI>();
             Debugging.Log("Loader", "Initialized Commander");
