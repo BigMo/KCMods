@@ -32,7 +32,7 @@ To create your own mod, simply create a new folder in the `Scripts` folder in Vi
 
 If you want to test your mods in-game, copy your mod folder (e.g. `Scripts\MyAwesomeMod`) to the game's mod folder (`Kingdoms and Castles\KingdomsAndCastles_Data\mods`). If you use any of my shared classes, copy them over with your mods' files (`Kingdoms and Castles\KingdomsAndCastles_Data\mods\MyAwesomeMod`).
 
-_Note: I'm working on automating this process. If you got any pointers on how to do this, please share them!_
+_Note: You can use tools such as ArchieV's [KaC Compiler](https://github.com/ArchieV1/KaC-Compiler) to automate this process_
 
 ## Unity Project
 
