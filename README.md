@@ -1,6 +1,6 @@
 # Zat's Kingdoms and Castles Mods
 
-This repository contains my mods and mod frameworks for the game Kingdoms and Castles (which I higly recommend you to play).
+This repository contains my mods and mod frameworks for the game Kingdoms and Castles (which I highly recommend you to play).
 
 ## Frameworks
 
@@ -31,9 +31,10 @@ To create your own mod, simply create a new folder in the `Scripts` folder in Vi
 ### Deploying mods
 
 If you want to test your mods in-game, copy your mod folder (e.g. `Scripts\MyAwesomeMod`) to the game's mod folder (`Kingdoms and Castles\KingdomsAndCastles_Data\mods`). If you use any of my shared classes, copy them over with your mods' files (`Kingdoms and Castles\KingdomsAndCastles_Data\mods\MyAwesomeMod`).
-
-_Note: I'm working on automating this process. If you got any pointers on how to do this, please share them!_
+  
+To automate this process use ArchieV1's compiler script. Find it [here](https://github.com/ArchieV1/KC_compiler).
+Have all of the shared classes files you want to use be in the same folder as your code and set the variables inside of the "compiler"
 
 ## Unity Project
 
-The "Unity Project" folder can be opened with Unity 2018. It contains the default data from the [Kingdoms and Castles Toolkit](https://github.com/mpeddicord/Kingdoms-and-Castles-Toolkit) plus all of my prefabs, sprites and models.
+The "Unity Project" folder can be opened with Unity 2018.2.5f1. It contains the default data from the [Kingdoms and Castles Toolkit](https://github.com/mpeddicord/Kingdoms-and-Castles-Toolkit) plus all of my prefabs, sprites and models.
