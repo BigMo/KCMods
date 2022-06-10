@@ -33,13 +33,13 @@ namespace Bundling.Steam
             if (File.Exists(vdf))
             {
                 var libs = new VDFFile(vdf);
-                if (libs.RootElements.Count > 0 && libs.RootElements.Any(x => x.Name == "LibraryFolders"))
+                if (libs.RootElements.Count > 0 && libs.RootElements.Any(x => x.Name.ToLower() == "libraryfolders"))
                 {
-                    foreach (var e in libs["LibraryFolders"].Children)
+                    foreach (var e in libs["LibraryFolders"].Children.Where(e=>e.ContainsElement("path")))
                     {
                         int id = 0;
                         if (int.TryParse(e.Name, out id))
-                            dirs.Add(new SteamLibrary(id, e.Value.Replace(@"\\", @"\")));
+                            dirs.Add(new SteamLibrary(id, e["path"].Value.Replace(@"\\", @"\")));
                     }
                 }
             }

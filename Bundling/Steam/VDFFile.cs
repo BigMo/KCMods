@@ -92,7 +92,7 @@ namespace Bundling.Steam
         {
             get
             {
-                return RootElements.First(x => x.Name == key);
+                return RootElements.First(x => x.Name.ToLower() == key.ToLower());
             }
         }
         #endregion

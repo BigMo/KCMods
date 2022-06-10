@@ -33,12 +33,14 @@ namespace Zat.ModMenu
             Debugging.Active = true;
             Helper = Debugging.Helper = _helper;
             Debugging.Log("ModMenu", "SceneLoaded: Hey there!");
+            Debugging.Log("ModMenu", "SceneLoaded: Loading AssetBundle...");
             Assets = new AssetManager(_helper.modPath + "/Assets", "modmenu002");
             if (!Assets.BundleLoaded)
             {
                 Debugging.Log("ModMenu", "SceneLoaded: Failed to load AssetBundle!");
                 return;
             }
+            Debugging.Log("ModMenu", "SceneLoaded: AssetBundle loaded!");
             if (ModMenuUI.Instance)
             {
                 Debugging.Log("ModMenu", "SceneLoaded: ModUI instance already exists!");
@@ -50,8 +52,10 @@ namespace Zat.ModMenu
                 Debugging.Log("ModMenu", "SceneLoaded: Missing canvasPrefab!");
                 return;
             }
+            Debugging.Log("ModMenu", "SceneLoaded: Instantiating canvas prefab...");
             var canvas = GameObject.Instantiate(canvasPrefab) as GameObject;
             //canvas.transform.SetParent(parent, false);
+            Debugging.Log("ModMenu", "SceneLoaded: Adding ModMenuUI component...");
             canvas.AddComponent<ModMenuUI>();
             Debugging.Log("ModMenu", "Running!");
         }

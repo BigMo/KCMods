@@ -48,10 +48,12 @@ namespace Zat.ModMenu.UI
 
         public void Start()
         {
+            Debugging.Log("ModMenuUI", "Starting...");
             try
             {
                 Debugging.Active = true;
                 Debugging.Helper = Loader.Helper;
+                Debugging.Log("ModMenuUI", "Acquiring ModMenu canvas objects...");
                 transform.name = ModSettingsNames.Objects.ModMenuName;
                 header = transform.Find("ModSettingsUI/Header/Text")?.GetComponent<TextMeshProUGUI>();
                 collapseExpand = transform.Find("ModSettingsUI/CollapseExpand")?.GetComponent<UnityEngine.UI.Button>();
@@ -73,6 +75,7 @@ namespace Zat.ModMenu.UI
                 var drag = header.gameObject.AddComponent<DraggableRect>();
                 drag.movable = ui?.GetComponent<RectTransform>();
 
+                Debugging.Log("ModMenuUI", "Adding UI listeners...");
                 close.onClick.AddListener(() => ui.SetActive(false));
                 reset.onClick.AddListener(() =>
                 {
@@ -83,8 +86,9 @@ namespace Zat.ModMenu.UI
                 collapseExpand.onClick.AddListener(() => ToggleCollapseExpand());
 
                 if (gameObject.name != ModSettingsNames.Objects.ModMenuName)
-                    Debugging.Log("ModMenu", $"{nameof(ModMenuUI)} is attached to \"{gameObject.name}\" instead of \"{ModSettingsNames.Objects.ModMenuName}\"!");
+                    Debugging.Log("ModMenuUI", $"{nameof(ModMenuUI)} is attached to \"{gameObject.name}\" instead of \"{ModSettingsNames.Objects.ModMenuName}\"!");
 
+                Debugging.Log("ModMenuUI", "Fixing text alignments...");
                 header.alignment = TextAlignmentOptions.Midline;
                 saveText.alignment = TextAlignmentOptions.Midline;
                 resetText.alignment = TextAlignmentOptions.Midline;
@@ -92,30 +96,32 @@ namespace Zat.ModMenu.UI
                 noModsText.alignment = TextAlignmentOptions.Midline;
                 noMods.SetActive(true);
 
+                Debugging.Log("ModMenuUI", "Registering ReceiveListeners...");
                 port.RegisterReceiveListener<SettingsEntry>(ModSettingsNames.Methods.UpdateSetting, UpdateSettingHandler);
                 port.RegisterReceiveListener<ModConfig>(ModSettingsNames.Methods.RegisterMod, RegisterModHandler);
 
+                Debugging.Log("ModMenuUI", "Loading settings....");
                 savedSettings = LoadSettings();
                 ui.SetActive(false);
                 SetCollapseExpand(false);
 
-                Debugging.Log("ModMenu", $"Started: [{transform.parent?.name ?? "-"}] -> [{transform.name}] -> [{nameof(ModMenuUI)}]");
+                Debugging.Log("ModMenuUI", $"Started: [{transform.parent?.name ?? "-"}] -> [{transform.name}] -> [{nameof(ModMenuUI)}]");
 
                 var config = new InteractiveConfiguration<ModMenuSettings>();
                 menuSettings = config.Settings;
-                Debugging.Log("ModMenu", "Registering own meta-mod...");
+                Debugging.Log("ModMenuUI", "Registering own meta-mod...");
                 ModSettingsBootstrapper.Register(config.ModConfig,
                     (proxy, saved) => config.Install(proxy, saved),
                     (ex) =>
                     {
-                        Debugging.Log("ModMenu", $"Failed to register meta-mod: {ex.Message}");
-                        Debugging.Log("ModMenu", ex.StackTrace);
+                        Debugging.Log("ModMenuUI", $"Failed to register meta-mod: {ex.Message}");
+                        Debugging.Log("ModMenuUI", ex.StackTrace);
                     });
             }
             catch (Exception ex)
             {
-                Debugging.Log("ModMenu", $"Failed to Start {nameof(ModMenuUI)}: {ex.Message}");
-                Debugging.Log("ModMenu", ex.StackTrace);
+                Debugging.Log("ModMenuUI", $"Failed to Start {nameof(ModMenuUI)}: {ex.Message}");
+                Debugging.Log("ModMenuUI", ex.StackTrace);
             }
         }
 

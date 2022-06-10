@@ -1,5 +1,6 @@
-# Unity Project
+This is a Unity scene and some extra bits.
+Built for Unity 2018.2.5f1 only.
 
-This project was copied from [The Kingdoms and Castles Toolkit](https://github.com/mpeddicord/Kingdoms-and-Castles-Toolkit).
 
-It contains all prefabs, sprites and asset bundles of my mods.
+Learn how to use the Toolkit:
+https://docs.google.com/document/d/1hRrV92_n9zuYxuB-7yCaiftzFsGEsoRRkMnTbaaKRqM/edit?usp=sharing

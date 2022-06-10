@@ -10,37 +10,39 @@ namespace Bundling
 {
     class Program
     {
-        private const string DEFINITIONSFILE = "mod_bundles.json";
+        private const string DEFINITIONSFILE = @"..\..\..\Scripts\mod_bundles.json";
 
         static void Main(string[] args)
         {
             var definitionsFile = new FileInfo(DEFINITIONSFILE);
+            System.Environment.CurrentDirectory = definitionsFile.DirectoryName;
 
-            if (args.Length != 1)
+            if (args.Length < 1)
             {
-                Debug.WriteLine("Usage: Bundling <bundlename>");
+                Debug.WriteLine("Usage: Bundling <bundlename> [<bundlename>, ...]");
                 return;
             }
 
-            try
-            {
+            //try
+            //{
                 var bundles = new ModBundleManager(definitionsFile);
                 if (args[0] == "--all")
                     bundles.BundleAll();
                 else
-                    bundles.Bundle(bundles.GetModBundleDefinition(args[0]));
+                    foreach(var bundleName in args)
+                        bundles.Bundle(bundles.GetModBundleDefinition(bundleName));
 
                 Debug.WriteLine("Done!");
-            }
-            catch(FileNotFoundException)
-            {
-                Debug.WriteLine("No definitions found; creating example file");
-                ModBundleManager.CreateSampleFile(definitionsFile);
-            }
-            catch(Exception ex)
-            {
-                PrintExceptionRecursive(ex);
-            }
+            //}
+            //catch(FileNotFoundException)
+            //{
+            //    Debug.WriteLine("No definitions found; creating example file");
+            //    ModBundleManager.CreateSampleFile(definitionsFile);
+            //}
+            //catch(Exception ex)
+            //{
+            //    PrintExceptionRecursive(ex);
+            //}
         }
 
         private static void PrintExceptionRecursive(Exception ex)
