@@ -5,22 +5,25 @@ namespace Zat.Shared.Reflection
 {
     public static class ZatsReflection
     {
-        private static FieldInfo GetFieldInfo(Type t, string name, bool instance = true)
+        public static FieldInfo GetFieldInfo(Type t, string name, bool instance = true)
         {
             var flags = BindingFlags.Public | BindingFlags.NonPublic;
             if (instance) flags |= BindingFlags.Instance;
+            else flags |= BindingFlags.Static;
             return t.GetField(name, flags);
         }
-        private static PropertyInfo GetPropertyInfo(Type t, string name, bool instance = true)
+        public static PropertyInfo GetPropertyInfo(Type t, string name, bool instance = true)
         {
             var flags = BindingFlags.Public | BindingFlags.NonPublic;
             if (instance) flags |= BindingFlags.Instance;
+            else flags |= BindingFlags.Static;
             return t.GetProperty(name, flags);
         }
-        private static MethodInfo GetMethodInfo(Type t, string name, bool instance = true)
+        public static MethodInfo GetMethodInfo(Type t, string name, bool instance = true)
         {
             var flags = BindingFlags.Public | BindingFlags.NonPublic;
             if (instance) flags |= BindingFlags.Instance;
+            else flags |= BindingFlags.Static;
             return t.GetMethod(name, flags);
         }
 

@@ -528,6 +528,9 @@
     <Compile Include="Shared\Zat.Reflection.cs" />
     <Compile Include="Shared\Zat.Rendering.cs" />
     <Compile Include="Shared\Zat.UI.Utilities.cs" />
+    <Compile Include="SpeedUp\Loader.cs" />
+    <Compile Include="SpeedUp\SpeedUpComponent.cs" />
+    <Compile Include="SpeedUp\SpeedUpSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Shared\Zat.AssetLoading.cs" />

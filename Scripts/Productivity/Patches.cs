@@ -41,76 +41,113 @@ namespace Zat.Productivity.Buildings
     }
 
     [HarmonyPatch(typeof(Field))]
-    [HarmonyPatch("DeferredYield")]
+    [HarmonyPatch("OnYieldResources")]
     public static class PatchField
     {
-        static bool Prefix(Field __instance)
+        static bool Prefix(Field __instance, ref float YieldAmt, FreeResourceType t)
         {
-            var Yield = __instance.GetField<ResourceAmount>("deferredYield");
             if (Loader.Settings?.Field == null || !Loader.Settings.Field.Enabled) return true;
 
-            ResourceManipulation.SetYield(
-                ref Yield,
-                FreeResourceType.Wheat,
-                Loader.Settings.Field.ModificationMode,
-                Loader.Settings.Field.Factor.Value
-            );
-            __instance.SetField("deferredYield", Yield);
+            switch (Loader.Settings.Field.ModificationMode)
+            {
+                case ResourceManipulation.ModificationMode.Multiply:
+                    YieldAmt *= Loader.Settings.Field.Factor.Value;
+                    break;
+                case ResourceManipulation.ModificationMode.Fixed:
+                    YieldAmt += Loader.Settings.Field.Factor.Value;
+                    break;
+            }
             return true;
         }
     }
 
-    [HarmonyPatch(typeof(IronMine))]
-    [HarmonyPatch("OnYieldResources")]
-    public static class PatchIronMine
-    {
-        static bool Prefix(Field __instance, ref ResourceAmount Yield)
-        {
-            if (Loader.Settings?.IronMine == null || !Loader.Settings.IronMine.Enabled) return true;
+    //[HarmonyPatch(typeof(IronMine))]
+    //[HarmonyPatch("OnYieldResources")]
+    //public static class PatchIronMine
+    //{
+    //    static bool Prefix(Field __instance, ref ResourceAmount Yield)
+    //    {
+    //        if (Loader.Settings?.IronMine == null || !Loader.Settings.IronMine.Enabled) return true;
 
-            ResourceManipulation.SetYield(
-                ref Yield,
-                FreeResourceType.IronOre,
-                Loader.Settings.IronMine.ModificationMode,
-                Loader.Settings.IronMine.Factor.Value
-            );
-            return true;
-        }
-    }
+    //        ResourceManipulation.SetYield(
+    //            ref Yield,
+    //            FreeResourceType.IronOre,
+    //            Loader.Settings.IronMine.ModificationMode,
+    //            Loader.Settings.IronMine.Factor.Value
+    //        );
+    //        return true;
+    //    }
+    //}
 
     [HarmonyPatch(typeof(Orchard))]
     [HarmonyPatch("OnYieldResources")]
     public static class PatchOrchard
     {
-        static bool Prefix(Field __instance, ref ResourceAmount Yield)
+        static bool Prefix(Orchard __instance, ref float amt, ref FreeResourceType t)
         {
             if (Loader.Settings?.Orchard == null || !Loader.Settings.Orchard.Enabled) return true;
 
-            ResourceManipulation.SetYield(
-                ref Yield,
-                FreeResourceType.Apples,
-                Loader.Settings.Orchard.ModificationMode,
-                Loader.Settings.Orchard.Factor.Value
-            );
+            
+            switch(Loader.Settings.Orchard.ModificationMode)
+            {
+                case ResourceManipulation.ModificationMode.Multiply:
+                    amt *= Loader.Settings.Orchard.Factor.Value;
+                    break;
+                case ResourceManipulation.ModificationMode.Fixed:
+                    amt += Loader.Settings.Orchard.Factor.Value;
+                    break;
+            }
             return true;
         }
     }
 
-    [HarmonyPatch(typeof(Quarry))]
+
+    [HarmonyPatch(typeof(ProducerBase))]
     [HarmonyPatch("OnYieldResources")]
-    public static class PatchQuarry
+    public static class PatchProducerBase
     {
-        static bool Prefix(Field __instance, ref ResourceAmount Yield)
+        static bool Prefix(ProducerBase __instance, ref ResourceAmount Yield)
         {
-            if (Loader.Settings?.Quarry == null || !Loader.Settings.Quarry.Enabled) return true;
+            BuildingSettings settings;
+            if (__instance is Quarry)
+            {
+                settings = Loader.Settings.Quarry;
+            }
+            else if (__instance is IronMine)
+            {
+                settings = Loader.Settings.IronMine;
+            }
+            else
+            {
+                return true;
+            }
+            if (!settings?.Enabled) return true;
 
             ResourceManipulation.SetYield(
                 ref Yield,
-                FreeResourceType.Stone,
-                Loader.Settings.Quarry.ModificationMode,
-                Loader.Settings.Quarry.Factor.Value
+                settings == Loader.Settings.Quarry ? FreeResourceType.Stone : FreeResourceType.IronOre,
+                settings.ModificationMode,
+                settings.Factor.Value
             );
             return true;
         }
     }
+
+    //[HarmonyPatch(typeof(Quarry))]
+    //[HarmonyPatch("OnYieldResources")]
+    //public static class PatchQuarry
+    //{
+    //    static bool Prefix(Field __instance, ref ResourceAmount Yield)
+    //    {
+    //        if (Loader.Settings?.Quarry == null || !Loader.Settings.Quarry.Enabled) return true;
+
+    //        ResourceManipulation.SetYield(
+    //            ref Yield,
+    //            FreeResourceType.Stone,
+    //            Loader.Settings.Quarry.ModificationMode,
+    //            Loader.Settings.Quarry.Factor.Value
+    //        );
+    //        return true;
+    //    }
+    //}
 }

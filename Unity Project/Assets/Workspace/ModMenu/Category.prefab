@@ -212,12 +212,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.16078432, g: 0.3529412, b: 0.49803925, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 370249c29c6b428449091fe354ddc45b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8b193daf4d2b6f7429594b6d357fc6ef, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -284,12 +284,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8396226, g: 0.8396226, b: 0.8396226, a: 0.79607844}
+  m_Color: {r: 0.12006053, g: 0.25434873, b: 0.3584906, a: 0.79607844}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 935270d6b7b681b44a28259d80ef3cb9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8b193daf4d2b6f7429594b6d357fc6ef, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -767,9 +767,9 @@ RectTransform:
   m_Father: {fileID: 1521959282681602616}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -42}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &7731373326978078868
@@ -921,6 +921,48 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 2746989087401997367, guid: 7f8829f3d7d257a4dba8759e2107ab13,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 0.16078432
+      objectReference: {fileID: 0}
+    - target: {fileID: 2746989087401997367, guid: 7f8829f3d7d257a4dba8759e2107ab13,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0.3529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 2746989087401997367, guid: 7f8829f3d7d257a4dba8759e2107ab13,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0.49803925
+      objectReference: {fileID: 0}
+    - target: {fileID: 2746989087401997367, guid: 7f8829f3d7d257a4dba8759e2107ab13,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 8b193daf4d2b6f7429594b6d357fc6ef,
+        type: 3}
+    - target: {fileID: 3971937021859970537, guid: 7f8829f3d7d257a4dba8759e2107ab13,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 0.16078432
+      objectReference: {fileID: 0}
+    - target: {fileID: 3971937021859970537, guid: 7f8829f3d7d257a4dba8759e2107ab13,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0.3529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 3971937021859970537, guid: 7f8829f3d7d257a4dba8759e2107ab13,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0.49803925
+      objectReference: {fileID: 0}
+    - target: {fileID: 3971937021859970537, guid: 7f8829f3d7d257a4dba8759e2107ab13,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 8b193daf4d2b6f7429594b6d357fc6ef,
+        type: 3}
     - target: {fileID: 3971937022419344547, guid: 7f8829f3d7d257a4dba8759e2107ab13,
         type: 3}
       propertyPath: m_textInfo.characterCount

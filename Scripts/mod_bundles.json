@@ -1,5 +1,23 @@
 ﻿[
   {
+    "sourceDirectory": ".\\Productivity",
+    "bundleName": "Productivity",
+    "targetDirectory": "Productivity",
+    "dependencies": [
+      "Zat.Shared"
+    ],
+    "deploy": true
+  },
+  {
+    "sourceDirectory": ".\\SpeedUp",
+    "bundleName": "SpeedUp",
+    "targetDirectory": "SpeedUp",
+    "dependencies": [
+      "Zat.Shared"
+    ],
+    "deploy": true
+  },
+  {
     "sourceDirectory": ".\\Commander",
     "bundleName": "Commander",
     "assetBundleSource": "..\\Unity Project\\Assets\\Workspace",
@@ -39,6 +57,6 @@
     "sourceDirectory": ".\\Shared",
     "bundleName": "Zat.Shared",
     "deploy": false,
-    "minify":  true
+    "minify": true
   }
 ]

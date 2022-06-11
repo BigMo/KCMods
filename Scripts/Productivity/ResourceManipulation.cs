@@ -14,7 +14,7 @@ namespace Zat.Productivity
         public static string[] MODES = Enum.GetNames(typeof(ModificationMode));
         public static void SetYield(ref ResourceAmount yield, FreeResourceType type, ModificationMode mode, float num)
         {
-            var count = yield.Get(FreeResourceType.Charcoal);
+            var count = yield.Get(type);
             switch (mode)
             {
                 case ModificationMode.Fixed:

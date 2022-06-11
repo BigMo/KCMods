@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine;
 using Zat.Shared;
 using Zat.Shared.Reflection;
+using Zat.Shared.UI.Utilities;
 
 namespace Zat.Commander
 {
@@ -93,6 +94,9 @@ namespace Zat.Commander
             titleText.alignment = TextAlignmentOptions.Midline;
             var noneText = transform.Find("CommanderWindow/Groups/None/Text")?.GetComponent<TextMeshProUGUI>();
             noneText.alignment = TextAlignmentOptions.Midline;
+
+            var drag = window.gameObject.AddComponent<DraggableRect>();
+            drag.movable = window?.GetComponent<RectTransform>();
 
             entries = new CommandEntry[9];
             var prefab = Loader.Assets.GetPrefab("assets/workspace/Commander/SingleSmall.prefab");

@@ -135,26 +135,14 @@ namespace Zat.ModMenu
         internal static class CreditsPatch
         {
             public static TextMeshProUGUI CreditsNames { get; private set; }
-            static void Postfix(CreditsUI __instance)
+            static void Prefix(CreditsUI __instance)
             {
                 try
                 {
-                    //Dump(__instance.CreditsContainer.transform, ">");
-                    var mods = ModMenuUI.Instance?.Configs?.ToArray() ?? new Shared.ModMenu.API.ModConfig[0];
-                    var steve = __instance.CreditsContainer.transform.Find("Credits1/Steve");
-                    var modDevs = GameObject.Instantiate(steve, __instance.CreditsContainer, false);
-                    var steveRect = __instance.CreditsContainer.transform.Find("Credits1/Steve").GetComponent<RectTransform>();
-                    var transRect = __instance.CreditsContainer.transform.Find("Credits1/And our translators").GetComponent<RectTransform>();
-
-                    modDevs.GetComponent<RectTransform>().localPosition = steveRect.localPosition + (transRect.localPosition - steveRect.localPosition) / 2f;
-
-                    var title = modDevs.gameObject.GetComponent<TextMeshProUGUI>();
-                    CreditsNames = modDevs.transform.Find("Credit (1)")?.GetComponent<TextMeshProUGUI>();
-                    GameObject.DestroyImmediate(CreditsNames.gameObject.GetComponent<Localize>());
-
-                    title.text = "Mod Developers";
-                    CreditsNames.text = string.Join(", ", ModMenuUI.Instance?.Authors ?? new string[] { "-" });
-                    Debugging.Log("CreditsUIPatch", "Installed credits");
+                    Debugging.Log("CreditsUIPatch", "Installing credits...");
+                    __instance.CallMethod("AddTitle", new object[] { "Mod Developers" });
+                    __instance.CallMethod("AddCredits", new object[] { ModMenuUI.Instance?.Authors ?? new string[] { "-" }, 22f });
+                    Debugging.Log("CreditsUIPatch", "Credits installed!");
                 }
                 catch (Exception ex)
                 {
@@ -166,8 +154,6 @@ namespace Zat.ModMenu
             private static void Dump(Transform p, string indent = "")
             {
                 Debugging.Log("[DUMP]", $"{indent} {p.name} ({p.GetComponent<RectTransform>()?.localPosition})");
-                //foreach (var comp in p.gameObject.GetComponents<Component>())
-                //    Debugging.Log("[DUMP]", $"{indent} COMP {comp.GetType().Name}");
 
                 foreach (Transform t in p)
                     Dump(t, "-" + indent);

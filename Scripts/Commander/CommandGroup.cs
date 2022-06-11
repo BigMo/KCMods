@@ -97,7 +97,7 @@ namespace Zat.Commander
                 var selectedObjs = GameUI.inst?.GetField<List<ISelectable>>("selectedObjs");
                 if (selectedObjs == null) return;
                 selectedObjs.Clear();
-                foreach (var unit in units) GameUI.inst.AddToSelected(unit.Selectable);
+                foreach (var unit in units) GameUI.inst.AddToSelection(unit.Selectable);
                 GameUI.inst.CallMethod("SelectCell", null, true, false);
                 GameUI.inst.CallMethod("CalculateFormationOffsets");
 
