@@ -18,16 +18,16 @@ namespace Zat.SpeedUp
         {
             Debugging.Active = true;
             Helper = Debugging.Helper = _helper;
-            Debugging.Log("SpeedUp", "SceneLoaded: Instantiating GameObject & SpeedUpComponent...");
+            Debugging.Log("Loader", "SceneLoaded: Instantiating GameObject & SpeedUpComponent...");
             if (container != null)
             {
-                Debugging.Log("SpeedUp", "GameObject container already exists; aborting");
+                Debugging.Log("Loader", "GameObject container already exists; aborting");
                 return;
             }
             container = new GameObject("SpeedUp");
             GameObject.DontDestroyOnLoad(container);
             container.AddComponent<SpeedUpComponent>();
-            Debugging.Log("SpeedUp", "Running!");
+            Debugging.Log("Loader", "Running!");
         }
     }
 }

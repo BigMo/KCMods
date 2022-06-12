@@ -7,6 +7,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using Zat.Shared;
+using Zat.Shared.ModMenu.Interactive;
 using Zat.Shared.Reflection;
 using Zat.Shared.UI.Utilities;
 
@@ -20,12 +21,15 @@ namespace Zat.Commander
 
         private GameObject groupContainer;
         private GameObject noneObject;
-        private GameObject window;
+        public GameObject window;
         private CommandEntry[] entries;
-        private readonly KeyCode[] numbers = new KeyCode[] {
-            KeyCode.Keypad1, KeyCode.Keypad2, KeyCode.Keypad3,
-            KeyCode.Keypad4, KeyCode.Keypad5, KeyCode.Keypad6,
-            KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad9
+        private InteractiveHotkeySetting[] Hotkeys = new InteractiveHotkeySetting[]
+        {
+            Loader.Settings.GroupKeys.Group1Key,
+            Loader.Settings.GroupKeys.Group2Key,
+            Loader.Settings.GroupKeys.Group3Key,
+            Loader.Settings.GroupKeys.Group4Key,
+            Loader.Settings.GroupKeys.Group5Key
         };
 
         private static IEnumerable<UnitSystem.Army> PlayerArmies
@@ -33,9 +37,11 @@ namespace Zat.Commander
             get
             {
                 if (!UnitSystem.inst) return Enumerable.Empty<UnitSystem.Army>();
-                return UnitSystem.inst.GetField<List<UnitSystem.Army>>("armies")
+                return UnitSystem.inst?.armies?
+                        .data?
+                        .Where(a => a != null)
                         .Where(a => a.teamId == 0)
-                        .Where(a => a.ValidToSelect());
+                        .Where(a => a.ValidToSelect()) ?? Enumerable.Empty<UnitSystem.Army>();
             }
         }
         private static IEnumerable<ShipBase> PlayerShips
@@ -98,13 +104,14 @@ namespace Zat.Commander
             var drag = window.gameObject.AddComponent<DraggableRect>();
             drag.movable = window?.GetComponent<RectTransform>();
 
-            entries = new CommandEntry[9];
+            entries = new CommandEntry[Hotkeys.Length];
             var prefab = Loader.Assets.GetPrefab("assets/workspace/Commander/SingleSmall.prefab");
             for (int i = 0; i < entries.Length; i++)
             {
                 var entryObj = GameObject.Instantiate(prefab);
                 var entry = entries[i] = entryObj.AddComponent<CommandEntry>();
                 entry.Init();
+                entry.Hotkey = Hotkeys[i];
                 entry.Group = CommandGroup.Empty;
                 entry.Designation = (i + 1);
                 entry.Visible = false;
@@ -130,11 +137,14 @@ namespace Zat.Commander
 
         public void Update()
         {
+            if (Input.GetKeyDown(Loader.Settings.ToggleKey.Key))
+                Loader.Settings.Visibility.Value = !Loader.Settings.Visibility.Value;
+
             try
             {
-                for (int i = 0; i < numbers.Length; i++)
+                for (int i = 0; i < Hotkeys.Length; i++)
                 {
-                    if (Input.GetKeyDown(numbers[i]))
+                    if (Input.GetKeyDown(Hotkeys[i].Key))
                     {
                         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
                         {
@@ -175,7 +185,7 @@ namespace Zat.Commander
         }
         private void SaveSlots()
         {
-            var slots = Enumerable.Range(0, 9)
+            var slots = Enumerable.Range(0, Hotkeys.Length)
                 .Where(i => entries[i] != null && entries[i].Visible)
                 .Select(i => new CommandEntrySaveSlot() { slot = i, armies = entries[i].Group.Guids.ToArray() });
             PlayerPrefs.SetString(SaveSlotsName, JsonConvert.SerializeObject(slots));

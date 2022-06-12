@@ -90,29 +90,24 @@ namespace Zat.Commander
             try
             {
                 if (!HasUnits) return;
-                var highlightedObjs = GameUI.inst?.GetField<List<ISelectable>>("highlightedObjs");
-                if (highlightedObjs == null) return;
-                highlightedObjs.Clear();
-                //highlightedObjs.AddRange(armies);
-                var selectedObjs = GameUI.inst?.GetField<List<ISelectable>>("selectedObjs");
-                if (selectedObjs == null) return;
-                selectedObjs.Clear();
+                GameUI.inst.highlightedObjs.Clear();
+                GameUI.inst.selectedObjs.Clear();
                 foreach (var unit in units) GameUI.inst.AddToSelection(unit.Selectable);
-                GameUI.inst.CallMethod("SelectCell", null, true, false);
+                GameUI.inst.SelectCell(null, true);
                 GameUI.inst.CallMethod("CalculateFormationOffsets");
 
-                var army = Units.FirstOrDefault(u => u.Type == CommandUnit.UnitType.Archer || u.Type == CommandUnit.UnitType.Soldier);
-                var ship = Units.FirstOrDefault(u => u.Type == CommandUnit.UnitType.TroopTransportShip);
-                if (army != null)
-                {
-                    GameUI.inst.generalLargeUI.SetSelectedArmy(army.Army);
-                    GameUI.inst.generalLargeUI.gameObject.SetActive(true);
-                }
-                if (ship != null)
-                {
-                    GameUI.inst.shipUI.SetSelectedShip(ship.Ship);
-                    GameUI.inst.shipUI.gameObject.SetActive(true);
-                }
+                //var army = Units.FirstOrDefault(u => u.Type == CommandUnit.UnitType.Archer || u.Type == CommandUnit.UnitType.Soldier);
+                //var ship = Units.FirstOrDefault(u => u.Type == CommandUnit.UnitType.TroopTransportShip);
+                //if (army != null)
+                //{
+                //    GameUI.inst.generalLargeUI.SetSelectedArmy(army.Army);
+                //    GameUI.inst.generalLargeUI.gameObject.SetActive(true);
+                //}
+                //if (ship != null)
+                //{
+                //    GameUI.inst.shipUI.SetSelectedShip(ship.Ship);
+                //    GameUI.inst.shipUI.gameObject.SetActive(true);
+                //}
             }
             catch (Exception ex)
             {

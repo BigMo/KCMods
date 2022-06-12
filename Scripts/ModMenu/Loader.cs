@@ -114,10 +114,10 @@ namespace Zat.ModMenu
                     var modMenuRect = pmModMenuGO.GetComponent<RectTransform>();
 
                     settingsRect.sizeDelta = new Vector2(154, 30);
-                    settingsRect.localPosition = new Vector3(-32.48318f, -134.3f, 0.0005999557f);
+                    settingsRect.localPosition = new Vector3(-32.48318f, settingsRect.localPosition.y, settingsRect.localPosition.z);
 
                     modMenuRect.sizeDelta = new Vector2(68, 30);
-                    modMenuRect.localPosition = new Vector3(81.4808f, -134.3f, 0.0005999557f);
+                    modMenuRect.localPosition = new Vector3(81.4808f, settingsRect.localPosition.y, settingsRect.localPosition.z);
 
                     once = false;
                     Debugging.Log("MainMenuPatch", "Installed pause menu button");

@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using Zat.Shared;
+using Zat.Shared.ModMenu.Interactive;
 
 namespace Zat.Commander
 {
@@ -62,6 +63,7 @@ namespace Zat.Commander
             }
         }
         public UnityEvent OnGroupEmpty { get { return onGroupEmpty; } }
+        public InteractiveHotkeySetting Hotkey { get; set; }
         public int Designation
         {
             get { return designation; }

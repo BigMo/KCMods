@@ -15,30 +15,68 @@ namespace Zat.Productivity
      * You can put categories into categories and settings into categories as you like.
      */
 
-    [Mod("Productivity", "v0.1", "Zat")]
+    [Mod("Productivity", "v1.0", "Zat")]
     public class ProductivitySettings
     {
+        [Category("Food")]
+        public FoodSettings Food { get; private set; }
 
-        //Specific Building Options
+        [Category("Goods")]
+        public GoodsSettings Goods { get; private set; }
+
+        [Category("Resources")]
+        public ResourceSettings Resources { get; private set; }
+    }
+
+    public class FoodSettings
+    {
         [Category("Bakery")]
         public BuildingSettings Baker { get; private set; }
-
-        [Category("Charcoal Maker")]
-        public BuildingSettings CharcoalMaker { get; private set; }
 
         [Category("Field")]
         public BuildingSettings Field { get; private set; }
 
-        [Category("Iron Mine")]
-        public BuildingSettings IronMine { get; private set; }
-
         [Category("Orchard")]
         public BuildingSettings Orchard { get; private set; }
+
+        [Category("Fishing Hut")]
+        public BuildingSettings FishingHut { get; private set; }
+    }
+
+    public class GoodsSettings
+    {
+        [Category("Charcoal Maker")]
+        public BuildingSettings CharcoalMaker { get; private set; }
+
+        [Category("Blacksmith")]
+        public BlacksmithSettings Blacksmith { get; private set; }
+    }
+
+    public class BlacksmithSettings
+    {
+        [Setting("Enabled")]
+        [Toggle(true, "Enabled")]
+        public InteractiveToggleSetting Enabled { get; private set; }
+
+        [Category("Tools")]
+        public ProduceSettings Tools { get; private set; }
+
+        [Category("Armament")]
+        public ProduceSettings Armament { get; private set; }
+    }
+
+    public class ResourceSettings
+    {
+
+        [Category("Forester")]
+        public BuildingSettings Forester { get; private set; }
+
+        [Category("Iron Mine")]
+        public BuildingSettings IronMine { get; private set; }
 
         [Category("Quarry")]
         public BuildingSettings Quarry { get; private set; }
     }
-
 
     public class BuildingSettings
     {
@@ -46,6 +84,19 @@ namespace Zat.Productivity
         [Toggle(true, "Enabled")]
         public InteractiveToggleSetting Enabled { get; private set; }
 
+        [Setting("Factor", "The yield is multiplied by this value")]
+        [Slider(0f, 10f, 1f, "Factor: x1.00")]
+        public InteractiveSliderSetting Factor { get; private set; }
+
+        [Setting("Mode", "Whether to multiply the yield or set it to a fixed value")]
+        [Select(0, "Multiply", "Fixed")]
+        public InteractiveSelectSetting Mode { get; private set; }
+
+        public ResourceManipulation.ModificationMode ModificationMode { get { return (ResourceManipulation.ModificationMode)(Mode.Value); } }
+    }
+
+    public class ProduceSettings
+    {
         [Setting("Factor", "The yield is multiplied by this value")]
         [Slider(0f, 10f, 1f, "Factor: x1.00")]
         public InteractiveSliderSetting Factor { get; private set; }

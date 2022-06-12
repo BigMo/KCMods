@@ -487,6 +487,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commander\CommandEntry.cs" />
+    <Compile Include="Commander\CommanderSettings.cs" />
     <Compile Include="Commander\CommanderUI.cs" />
     <Compile Include="Commander\CommandGroup.cs" />
     <Compile Include="Commander\Loader.cs" />
