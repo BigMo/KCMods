@@ -18,6 +18,9 @@ namespace Zat.Productivity
     [Mod("Productivity", "v1.0", "Zat")]
     public class ProductivitySettings
     {
+        [Category("AI")]
+        public AISettings AI { get; private set; }
+
         [Category("Food")]
         public FoodSettings Food { get; private set; }
 
@@ -26,6 +29,36 @@ namespace Zat.Productivity
 
         [Category("Resources")]
         public ResourceSettings Resources { get; private set; }
+    }
+
+    public class AISettings
+    {
+        [Setting("Allies", "Enables Productivity for allied AIs")]
+        [Toggle(true, "Enabled")]
+        public InteractiveToggleSetting Allies { get; private set; }
+
+        [Setting("Enemies", "Enables Productivity for hostile AIs")]
+        [Toggle(true, "Enabled")]
+        public InteractiveToggleSetting Enemies { get; private set; }
+
+        [Setting("Neutral", "Enables Productivity for neutral AIs")]
+        [Toggle(true, "Enabled")]
+        public InteractiveToggleSetting Neutral { get; private set; }
+
+        public bool EnabledForAI(int teamId)
+        {
+            if (teamId == 0) return true;
+            switch (World.inst.RelationBetween(teamId, 0))
+            {
+                case World.Relations.Allies:
+                    return Allies.Value;
+                case World.Relations.Enemy:
+                    return Enemies.Value;
+                case World.Relations.Neutral:
+                    return Neutral.Value;
+            }
+            return Neutral.Value;
+        }
     }
 
     public class FoodSettings

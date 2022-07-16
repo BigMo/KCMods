@@ -12,6 +12,7 @@ using Zat.Shared.UI.Utilities;
 using Zat.Shared;
 using Zat.Shared.ModMenu.Interactive;
 using System.Collections.Generic;
+using Zat.Shared.Reflection;
 
 namespace Zat.ModMenu.UI
 {
@@ -45,6 +46,7 @@ namespace Zat.ModMenu.UI
         }
         public IEnumerable<ModConfig> Configs { get { return settingsManager.Mods; } }
         public string[] Authors { get { return Configs.Select(m => m.author).Distinct().ToArray(); } }
+        private static string[] originalDevNames;
 
         public void Start()
         {
@@ -111,12 +113,25 @@ namespace Zat.ModMenu.UI
                 menuSettings = config.Settings;
                 Debugging.Log("ModMenuUI", "Registering own meta-mod...");
                 ModSettingsBootstrapper.Register(config.ModConfig,
-                    (proxy, saved) => config.Install(proxy, saved),
+                    (proxy, saved) =>
+                    {
+                        config.Install(proxy, saved);
+                        Debugging.Log("ModMenuUI", "Registered own meta-mod!");
+                    },
                     (ex) =>
                     {
                         Debugging.Log("ModMenuUI", $"Failed to register meta-mod: {ex.Message}");
                         Debugging.Log("ModMenuUI", ex.StackTrace);
                     });
+
+                Debugging.Log("ModMenuUI", "Acquiring original dev names...");
+
+                if (originalDevNames == null)
+                    originalDevNames = ZatsReflection.GetStaticField<Assets.NameList, string[]>("devNames");
+                Debugging.Log("ModMenuUI", $"Got: {string.Join(", ", originalDevNames)}");
+
+
+                Debugging.Log("ModMenuUI", "Done!");
             }
             catch (Exception ex)
             {
@@ -196,8 +211,7 @@ namespace Zat.ModMenu.UI
                 UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
                 if (noMods != null) noMods.SetActive(!settingsManager.Mods.Any());
                 SetCollapseExpand(false);
-                if (Loader.CreditsPatch.CreditsNames != null)
-                    Loader.CreditsPatch.CreditsNames.text = string.Join(", ", Authors);
+                UpdateDevNames();
             }
             catch (Exception ex)
             {
@@ -205,6 +219,13 @@ namespace Zat.ModMenu.UI
                 Debugging.Log("ModMenu", ex.StackTrace);
                 handler.SendError(port.gameObject.name, ex);
             }
+        }
+
+        private void UpdateDevNames()
+        {
+            ZatsReflection.SetStaticField<Assets.NameList, string[]>("devNames", originalDevNames.Concat(Authors.Distinct().Select(n => $"{n} (Modder)")).ToArray());
+            var names = ZatsReflection.GetStaticField<Assets.NameList, string[]>("devNames");
+            Debugging.Log("ModMenuUI", $"New dev names: {string.Join(", ", names)}");
         }
 
         private void OnUIUpdate(SettingsEntry setting)

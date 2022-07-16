@@ -40,6 +40,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,6 +49,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UI\frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
     <Compile Include="ModBundleDefinition.cs" />
     <Compile Include="ModBundleManager.cs" />
     <Compile Include="Program.cs" />
@@ -56,9 +64,23 @@
     <Compile Include="Steam\SteamLibrary.cs" />
     <Compile Include="Steam\SteamManager.cs" />
     <Compile Include="Steam\VDFFile.cs" />
+    <Compile Include="UI\ModBundleDefinitionUI.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\ModBundleDefinitionUI.Designer.cs">
+      <DependentUpon>ModBundleDefinitionUI.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UI\frmMain.resx">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\ModBundleDefinitionUI.resx">
+      <DependentUpon>ModBundleDefinitionUI.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

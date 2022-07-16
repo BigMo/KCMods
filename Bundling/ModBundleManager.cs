@@ -30,42 +30,42 @@ namespace Bundling
 
         public ModBundleDefinition GetModBundleDefinition(string name)
         {
-            return modBundles.FirstOrDefault(d => d.bundleName == name);
+            return modBundles.FirstOrDefault(d => d.BundleName == name);
         }
 
         public static void CreateSampleFile(FileInfo definitionsFile)
         {
             var definition = new ModBundleDefinition()
             {
-                bundleName = "Name.Of.Your.Bundle",
-                sourceDirectory = @"Path\To\Your\Sources",
-                assetBundleName = "Name.Of.Your.Assets",
-                assetBundleSource = @"Path\To\Your\Assets",
-                dependencies = new string[] {"BundlesYouDependOn"}
+                BundleName = "Name.Of.Your.Bundle",
+                SourceDirectory = @"Path\To\Your\Sources",
+                AssetBundleName = "Name.Of.Your.Assets",
+                AssetBundleSource = @"Path\To\Your\Assets",
+                Dependencies = new string[] {"BundlesYouDependOn"}
             };
             File.WriteAllText(definitionsFile.FullName, JsonConvert.SerializeObject(new ModBundleDefinition[] { definition }));
         }
 
         public void BundleAll()
         {
-            foreach (var bundle in modBundles.Where(b => b.deploy))
+            foreach (var bundle in modBundles.Where(b => b.Deploy))
                 Bundle(bundle);
         }
 
         public void Bundle(ModBundleDefinition definition)
         {
-            Debug.WriteLine($"[#] Bundling {definition.bundleName}...");
+            Debug.WriteLine($"[#] Bundling {definition.BundleName}...");
             var usings = new List<string>();
             var code = new StringBuilder();
             var sourceFileSize = 0L;
             BundleModCode(definition, usings, code, ref sourceFileSize);
 
-            var fileName = $"{definition.bundleName}.Bundled.cs";
+            var fileName = $"{definition.BundleName}.Bundled.cs";
             foreach (var chr in Path.GetInvalidFileNameChars())
                 fileName = fileName.Replace(chr, '.');
 
-            if (definition.targetDirectory == null) throw new Exception("Target directory unspecified!");
-            var targetDir = new DirectoryInfo(Path.Combine(kcDirectory.FullName, "KingdomsAndCastles_Data", "mods", definition.targetDirectory));
+            if (definition.TargetDirectory == null) throw new Exception("Target directory unspecified!");
+            var targetDir = new DirectoryInfo(Path.Combine(kcDirectory.FullName, "KingdomsAndCastles_Data", "mods", definition.TargetDirectory));
             if (!targetDir.Exists)
             {
                 Debug.WriteLine($"[#] Creating target directory \"{targetDir.FullName}\"...");
@@ -91,9 +91,9 @@ namespace Bundling
             Debug.WriteLine($"[#->] Decreased total code size by {(decrease * 100).ToString("0.00")}% (before: {sourceFileSize} bytes, after: {targetFileSize} bytes)");
 
             //Assets
-            if (definition.assetBundleSource != null)
+            if (definition.AssetBundleSource != null)
             {
-                var sourceDir = new DirectoryInfo(definition.assetBundleSource);
+                var sourceDir = new DirectoryInfo(definition.AssetBundleSource);
                 if (!sourceDir.Exists) throw new Exception("Assets source directory does not exist!");
                 var assetsDirectory = new DirectoryInfo(Path.Combine(targetDir.FullName, "Assets"));
                 if (assetsDirectory.Exists)
@@ -104,10 +104,10 @@ namespace Bundling
                 Debug.WriteLine($"[#] Creating Assets directory \"{assetsDirectory.FullName}\"...");
                 assetsDirectory.Create();
 
-                CopyPlatformFiles("linux", definition.assetBundleName, sourceDir, assetsDirectory);
-                CopyPlatformFiles("osx", definition.assetBundleName, sourceDir, assetsDirectory);
-                CopyPlatformFiles("win32", definition.assetBundleName, sourceDir, assetsDirectory);
-                CopyPlatformFiles("win64", definition.assetBundleName, sourceDir, assetsDirectory);
+                CopyPlatformFiles("linux", definition.AssetBundleName, sourceDir, assetsDirectory);
+                CopyPlatformFiles("osx", definition.AssetBundleName, sourceDir, assetsDirectory);
+                CopyPlatformFiles("win32", definition.AssetBundleName, sourceDir, assetsDirectory);
+                CopyPlatformFiles("win64", definition.AssetBundleName, sourceDir, assetsDirectory);
             }
         }
 
@@ -158,18 +158,18 @@ namespace Bundling
 
         private void BundleModCode(ModBundleDefinition definition, List<string> usings, StringBuilder code, ref long totalFileSize)
         {
-            if (definition.dependencies != null)
-                foreach (var dependency in definition.dependencies)
+            if (definition.Dependencies != null)
+                foreach (var dependency in definition.Dependencies)
                     BundleModCode(GetModBundleDefinition(dependency), usings, code, ref totalFileSize);
 
             // Sources
-            Debug.WriteLine($"[#->] Bundling {definition.bundleName}'s sources...");
-            var dir = new DirectoryInfo(definition.sourceDirectory);
+            Debug.WriteLine($"[#->] Bundling {definition.BundleName}'s sources...");
+            var dir = new DirectoryInfo(definition.SourceDirectory);
             if (!dir.Exists) throw new DirectoryNotFoundException("Failed to traverse source directory; directory not found");
             var files = dir.GetFiles("*.cs", SearchOption.AllDirectories);
-            if (definition.excludePatterns != null) files = files.Where(f => !definition.excludePatterns.Any(e => Regex.IsMatch(f.FullName, e))).ToArray();
+            if (definition.ExcludePatterns != null) files = files.Where(f => !definition.ExcludePatterns.Any(e => Regex.IsMatch(f.FullName, e))).ToArray();
             foreach (var file in files)
-                ProcessCodeFile(file, usings, code, definition.minify, ref totalFileSize);
+                ProcessCodeFile(file, usings, code, definition.Minify, ref totalFileSize);
         }
 
         private void ProcessCodeFile(FileInfo file, List<string> usings, StringBuilder code, bool minify, ref long totalFileSize)

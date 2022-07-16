@@ -129,35 +129,5 @@ namespace Zat.ModMenu
                 }
             }
         }
-
-        [HarmonyPatch(typeof(CreditsUI))]
-        [HarmonyPatch("OnEnable")]
-        internal static class CreditsPatch
-        {
-            public static TextMeshProUGUI CreditsNames { get; private set; }
-            static void Prefix(CreditsUI __instance)
-            {
-                try
-                {
-                    Debugging.Log("CreditsUIPatch", "Installing credits...");
-                    __instance.CallMethod("AddTitle", new object[] { "Mod Developers" });
-                    __instance.CallMethod("AddCredits", new object[] { ModMenuUI.Instance?.Authors ?? new string[] { "-" }, 22f });
-                    Debugging.Log("CreditsUIPatch", "Credits installed!");
-                }
-                catch (Exception ex)
-                {
-                    Debugging.Log("CreditsUIPatch", $"Failed to patch: {ex.Message}");
-                    Debugging.Log("CreditsUIPatch", ex.StackTrace);
-                }
-            }
-
-            private static void Dump(Transform p, string indent = "")
-            {
-                Debugging.Log("[DUMP]", $"{indent} {p.name} ({p.GetComponent<RectTransform>()?.localPosition})");
-
-                foreach (Transform t in p)
-                    Dump(t, "-" + indent);
-            }
-        }
     }
 }

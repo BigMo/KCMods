@@ -11,6 +11,7 @@ namespace Zat.Productivity.Buildings
         static bool Prefix(CharcoalMaker __instance, ref ResourceAmount Yield)
         {
             if (Loader.Settings?.Goods.CharcoalMaker == null || !Loader.Settings.Goods.CharcoalMaker.Enabled) return true;
+            if (!Loader.Settings?.AI.EnabledForAI(ResourceManipulation.GetTeamId(__instance)) ?? false) return true;
 
             ResourceManipulation.SetYield(
                 ref Yield,
@@ -29,6 +30,7 @@ namespace Zat.Productivity.Buildings
         static bool Prefix(Baker __instance, ref ResourceAmount Yield)
         {
             if (Loader.Settings?.Food.Baker == null || !Loader.Settings.Food.Baker.Enabled) return true;
+            if (!Loader.Settings?.AI.EnabledForAI(ResourceManipulation.GetTeamId(__instance)) ?? false) return true;
 
             ResourceManipulation.SetYield(
                 ref Yield,
@@ -47,6 +49,7 @@ namespace Zat.Productivity.Buildings
         static bool Prefix(Field __instance, ref float YieldAmt, FreeResourceType t)
         {
             if (Loader.Settings?.Food.Field == null || !Loader.Settings.Food.Field.Enabled) return true;
+            if (!Loader.Settings?.AI.EnabledForAI(ResourceManipulation.GetTeamId(__instance)) ?? false) return true;
 
             switch (Loader.Settings.Food.Field.ModificationMode)
             {
@@ -68,6 +71,7 @@ namespace Zat.Productivity.Buildings
         static bool Prefix(Orchard __instance, ref float amt, ref FreeResourceType t)
         {
             if (Loader.Settings?.Food.Orchard == null || !Loader.Settings.Food.Orchard.Enabled) return true;
+            if (!Loader.Settings?.AI.EnabledForAI(ResourceManipulation.GetTeamId(__instance)) ?? false) return true;
 
 
             switch (Loader.Settings.Food.Orchard.ModificationMode)
@@ -90,6 +94,7 @@ namespace Zat.Productivity.Buildings
         static bool Prefix(FishingHut __instance, ref int count)
         {
             if (Loader.Settings?.Food.FishingHut == null || !Loader.Settings.Food.FishingHut.Enabled) return true;
+            if (!Loader.Settings?.AI.EnabledForAI(ResourceManipulation.GetTeamId(__instance)) ?? false) return true;
 
 
             switch (Loader.Settings.Food.FishingHut.ModificationMode)
@@ -112,6 +117,7 @@ namespace Zat.Productivity.Buildings
         static bool Prefix(FishingHut __instance, ref int num)
         {
             if (Loader.Settings?.Resources.Forester == null || !Loader.Settings.Resources.Forester.Enabled) return true;
+            if (!Loader.Settings?.AI.EnabledForAI(ResourceManipulation.GetTeamId(__instance)) ?? false) return true;
 
 
             switch (Loader.Settings.Resources.Forester.ModificationMode)
@@ -148,6 +154,7 @@ namespace Zat.Productivity.Buildings
                 return true;
             }
             if (!settings?.Enabled) return true;
+            if (!Loader.Settings?.AI.EnabledForAI(ResourceManipulation.GetTeamId(__instance)) ?? false) return true;
 
             ResourceManipulation.SetYield(
                 ref Yield,
@@ -166,6 +173,7 @@ namespace Zat.Productivity.Buildings
         static bool Prefix(ProducerBasePlural __instance, ref ResourceAmount Yield)
         {
             if (Loader.Settings?.Goods.Blacksmith == null || !Loader.Settings.Goods.Blacksmith.Enabled) return true;
+            if (!Loader.Settings?.AI.EnabledForAI(ResourceManipulation.GetTeamId(__instance)) ?? false) return true;
 
             if (__instance is Blacksmith)
             {

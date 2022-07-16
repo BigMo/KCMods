@@ -47,6 +47,7 @@ namespace Zat.Productivity
                         //Resources
                         Settings.Resources.IronMine.Factor.OnUpdatedRemotely.AddListener((entry) => UpdateLabel(Settings.Resources.IronMine.Factor));
                         Settings.Resources.Quarry.Factor.OnUpdatedRemotely.AddListener((entry) => UpdateLabel(Settings.Resources.Quarry.Factor));
+                        Settings.Resources.Forester.Factor.OnUpdatedRemotely.AddListener((entry) => UpdateLabel(Settings.Resources.Forester.Factor));
                     },
                     (ex) =>
                     {
