@@ -1,5 +1,14 @@
 ﻿[
   {
+    "sourceDirectory": ".\\AutoTrade",
+    "bundleName": "AutoTrade",
+    "targetDirectory": "AutoTrade",
+    "dependencies": [
+      "Zat.Shared"
+    ],
+    "deploy": true
+  },
+  {
     "sourceDirectory": ".\\Productivity",
     "bundleName": "Productivity",
     "targetDirectory": "Productivity",

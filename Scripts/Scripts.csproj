@@ -532,6 +532,9 @@
     <Compile Include="SpeedUp\Loader.cs" />
     <Compile Include="SpeedUp\SpeedUpComponent.cs" />
     <Compile Include="SpeedUp\SpeedUpSettings.cs" />
+    <Compile Include="AutoTrade\Loader.cs" />
+    <Compile Include="AutoTrade\Patches.cs" />
+    <Compile Include="AutoTrade\AutoTradeSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Shared\Zat.AssetLoading.cs" />
