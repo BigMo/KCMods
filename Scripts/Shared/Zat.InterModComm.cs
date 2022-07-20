@@ -170,7 +170,7 @@ namespace Zat.Shared.InterModComm
                     message,
                     timeout,
                     (msg) => { callback?.Invoke(); },
-                    () => { error.Invoke(TimeoutException.Instance); });
+                    () => { error?.Invoke(TimeoutException.Instance); });
             }
             catch (Exception ex)
             {
@@ -199,7 +199,7 @@ namespace Zat.Shared.InterModComm
                     message,
                     timeout,
                     (msg) => { callback?.Invoke(msg.ParsePayload<R>()); },
-                    () => { error.Invoke(TimeoutException.Instance); });
+                    () => { error?.Invoke(TimeoutException.Instance); });
             }
             catch (Exception ex)
             {
@@ -258,6 +258,60 @@ namespace Zat.Shared.InterModComm
             catch (Exception ex)
             {
                 error?.Invoke(ex);
+            }
+        }
+        #endregion
+
+        #region Bootstrapping
+        public static void WaitForTargetPort(GameObject clientObject, string targetPortName, float delay, int retries, UnityAction<IMCPort> onConnected, UnityAction<Exception> onError)
+        {
+            var bootstrapper = clientObject.AddComponent<Bootstrapper>();
+            bootstrapper.WaitForTargetPort(targetPortName, delay, retries, (port) =>
+            {
+                GameObject.Destroy(bootstrapper); //Cleanup
+                onConnected?.Invoke(port); //Forward port
+            },
+            (ex) =>
+            {
+                GameObject.Destroy(bootstrapper); //Cleanup
+                onError?.Invoke(ex); //Forward error
+            });
+        }
+        private class Bootstrapper : MonoBehaviour
+        {
+            public void WaitForTargetPort(string targetPortName, float delay, int retries, UnityAction<IMCPort> onConnected, UnityAction<Exception> onError)
+            {
+                StartCoroutine(WaitForTarget(targetPortName, delay, retries, onConnected, onError));
+            }
+
+            private System.Collections.IEnumerator WaitForTarget(string targetPortName, float delay, int retries, UnityAction<IMCPort> onConnected, UnityAction<Exception> onError)
+            {
+                Exception lastError = null;
+                do
+                {
+                    try
+                    {
+                        TargetPortInitialized(targetPortName);
+                        lastError = null; //Clear last error
+                    }
+                    catch (Exception ex)
+                    {
+                        lastError = ex;
+                    }
+                    if (lastError != null) //Wait if there has been an error
+                        yield return new WaitForSeconds(delay);
+                } while (--retries > 0);
+
+                if (lastError != null) onError?.Invoke(lastError); //Error-out if we ended on an error
+                else onConnected?.Invoke(gameObject.AddComponent<IMCPort>()); //Else create the client port
+            }
+
+            private static void TargetPortInitialized(string targetPortName)
+            {
+                var go = GameObject.Find(targetPortName);
+                if (!go) throw new Exception($"Could not find target port's GameObject \"{targetPortName}\"!");
+                var comp = go.GetComponents(typeof(Component)).FirstOrDefault(c => c.GetType().Name.EndsWith(nameof(IMCPort)));
+                if (!comp) throw new Exception($"Target port's GameObject does not have an {nameof(IMCPort)} attached!");
             }
         }
         #endregion
