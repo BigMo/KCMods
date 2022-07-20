@@ -265,6 +265,11 @@ namespace Zat.Shared.InterModComm
         #region Bootstrapping
         public static void WaitForTargetPort(GameObject clientObject, string targetPortName, float delay, int retries, UnityAction<IMCPort> onConnected, UnityAction<Exception> onError)
         {
+            if (clientObject.GetComponent<Bootstrapper>())
+            {
+                onError?.Invoke(new Exception("There's already a bootstrapper registered to this GameObject"));
+                return;
+            }
             var bootstrapper = clientObject.AddComponent<Bootstrapper>();
             bootstrapper.WaitForTargetPort(targetPortName, delay, retries, (port) =>
             {
