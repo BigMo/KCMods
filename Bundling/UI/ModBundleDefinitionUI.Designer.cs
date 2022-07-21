@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Mod #1");
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Mod #2");
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Mod #3");
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Mod #1");
+            System.Windows.Forms.ListViewItem listViewItem5 = new System.Windows.Forms.ListViewItem("Mod #2");
+            System.Windows.Forms.ListViewItem listViewItem6 = new System.Windows.Forms.ListViewItem("Mod #3");
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label5 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -206,7 +206,9 @@
             this.label6.Size = new System.Drawing.Size(19, 13);
             this.label6.TabIndex = 0;
             this.label6.Text = "(?)";
-            this.helpToolTip.SetToolTip(this.label6, "The name of the sub-directory to create in the game\'s \"mods\" directory.");
+            this.helpToolTip.SetToolTip(this.label6, "The name of the sub-directory to create in the game\'s \"mods\" directory.\r\nRelative" +
+        " paths can be used, they will be relative to the mod bunde definition JSON file." +
+        "");
             // 
             // defGenTgt
             // 
@@ -376,13 +378,13 @@
             this.defDeps.CheckBoxes = true;
             this.defDeps.Dock = System.Windows.Forms.DockStyle.Fill;
             this.defDeps.HideSelection = false;
-            listViewItem1.StateImageIndex = 0;
-            listViewItem2.StateImageIndex = 0;
-            listViewItem3.StateImageIndex = 0;
+            listViewItem4.StateImageIndex = 0;
+            listViewItem5.StateImageIndex = 0;
+            listViewItem6.StateImageIndex = 0;
             this.defDeps.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2,
-            listViewItem3});
+            listViewItem4,
+            listViewItem5,
+            listViewItem6});
             this.defDeps.Location = new System.Drawing.Point(3, 16);
             this.defDeps.Name = "defDeps";
             this.defDeps.Size = new System.Drawing.Size(341, 81);
