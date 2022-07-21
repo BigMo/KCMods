@@ -1,71 +1,90 @@
-﻿[
+[
   {
     "sourceDirectory": ".\\AutoTrade",
-    "bundleName": "AutoTrade",
     "targetDirectory": "AutoTrade",
-    "dependencies": [
-      "Zat.Shared"
-    ],
-    "deploy": true
+    "bundleName": "AutoTrade",
+    "assetBundleSource": null,
+    "assetBundleName": null,
+    "dependencies": [ "Zat.Shared" ],
+    "excludePatterns": [],
+    "deploy": true,
+    "minify": false
   },
   {
     "sourceDirectory": ".\\Productivity",
-    "bundleName": "Productivity",
     "targetDirectory": "Productivity",
-    "dependencies": [
-      "Zat.Shared"
-    ],
-    "deploy": true
+    "bundleName": "Productivity",
+    "assetBundleSource": null,
+    "assetBundleName": null,
+    "dependencies": [ "Zat.Shared" ],
+    "excludePatterns": [],
+    "deploy": true,
+    "minify": false
   },
   {
     "sourceDirectory": ".\\SpeedUp",
-    "bundleName": "SpeedUp",
     "targetDirectory": "SpeedUp",
-    "dependencies": [
-      "Zat.Shared"
-    ],
-    "deploy": true
+    "bundleName": "SpeedUp",
+    "assetBundleSource": "",
+    "assetBundleName": "",
+    "dependencies": [ "Zat.Shared" ],
+    "excludePatterns": [],
+    "deploy": true,
+    "minify": false
   },
   {
     "sourceDirectory": ".\\Commander",
+    "targetDirectory": "CommanderBundle",
     "bundleName": "Commander",
     "assetBundleSource": "..\\Unity Project\\Assets\\Workspace",
     "assetBundleName": "commander001",
-    "targetDirectory": "CommanderBundle",
-    "dependencies": [
-      "Zat.Shared"
-    ],
-    "deploy": true
+    "dependencies": [ "Zat.Shared" ],
+    "excludePatterns": [],
+    "deploy": true,
+    "minify": false
   },
   {
     "sourceDirectory": ".\\Minimap",
+    "targetDirectory": "MinimapBundle",
     "bundleName": "Minimap",
     "assetBundleSource": "..\\Unity Project\\Assets\\Workspace",
     "assetBundleName": "minimap002",
-    "targetDirectory": "MinimapBundle",
-    "dependencies": [
-      "Zat.Shared"
-    ],
-    "deploy": true
+    "dependencies": [ "Zat.Shared" ],
+    "excludePatterns": [],
+    "deploy": true,
+    "minify": false
   },
   {
     "sourceDirectory": ".\\ModMenu",
+    "targetDirectory": "ModMenuBundle",
     "bundleName": "ModMenu",
     "assetBundleSource": "..\\Unity Project\\Assets\\Workspace",
     "assetBundleName": "modmenu002",
-    "targetDirectory": "ModMenuBundle",
-    "dependencies": [
-      "Zat.Shared"
-    ],
-    "excludePatterns": [
-      "DummyMod\\.cs"
-    ],
-    "deploy": true
+    "dependencies": [ "Zat.Shared" ],
+    "excludePatterns": [ "DummyMod\\.cs" ],
+    "deploy": true,
+    "minify": false
   },
   {
     "sourceDirectory": ".\\Shared",
+    "targetDirectory": "",
     "bundleName": "Zat.Shared",
+    "assetBundleSource": "",
+    "assetBundleName": "",
+    "dependencies": [],
+    "excludePatterns": [],
     "deploy": false,
-    "minify": true
+    "minify": false
+  },
+  {
+    "sourceDirectory": ".\\Unlocker",
+    "targetDirectory": "Unlocker",
+    "bundleName": "Unlocker",
+    "assetBundleSource": null,
+    "assetBundleName": null,
+    "dependencies": [ "Zat.Shared" ],
+    "excludePatterns": [],
+    "deploy": false,
+    "minify": false
   }
 ]

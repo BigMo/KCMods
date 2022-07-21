@@ -16,17 +16,18 @@ namespace Bundling
         private readonly List<ModBundleDefinition> modBundles;
         private readonly DirectoryInfo kcDirectory;
 
-        public ModBundleManager(FileInfo definitionsFile)
+        public ModBundleManager(IEnumerable<ModBundleDefinition> bundles)
         {
             var steam = new SteamManager();
             var kcApp = steam.GetAppByID(569480) ?? steam.GetAppByName("Kingdoms and Castles");
             if (kcApp == null) throw new Exception("Unable to find K&C install directory; steam version required!");
             kcDirectory = new DirectoryInfo(kcApp.Path);
             if (!kcDirectory.Exists) throw new Exception("K&C install directory does not exist!");
-            if (!definitionsFile.Exists)
-                throw new FileNotFoundException("Failed to parse mod bundle definitions; file not found", definitionsFile.FullName);
-            modBundles = JsonConvert.DeserializeObject<List<ModBundleDefinition>>(File.ReadAllText(definitionsFile.FullName));
+            modBundles = new List<ModBundleDefinition>(bundles);
         }
+
+        public ModBundleManager(FileInfo definitionsFile) : this(JsonConvert.DeserializeObject<List<ModBundleDefinition>>(File.ReadAllText(definitionsFile.FullName)))
+        { }
 
         public ModBundleDefinition GetModBundleDefinition(string name)
         {

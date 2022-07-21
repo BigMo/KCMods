@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Bundling
 {
@@ -12,37 +13,47 @@ namespace Bundling
     {
         private const string DEFINITIONSFILE = @"..\..\..\Scripts\mod_bundles.json";
 
+        [STAThread]
         static void Main(string[] args)
         {
-            var definitionsFile = new FileInfo(DEFINITIONSFILE);
-            System.Environment.CurrentDirectory = definitionsFile.DirectoryName;
-
-            if (args.Length < 1)
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            if (args.Length > 0)
             {
-                Debug.WriteLine("Usage: Bundling <bundlename> [<bundlename>, ...]");
-                return;
-            }
+                var definitionsFile = new FileInfo(DEFINITIONSFILE);
+                System.Environment.CurrentDirectory = definitionsFile.DirectoryName;
 
-            //try
-            //{
+                if (args.Length < 1)
+                {
+                    Debug.WriteLine("Usage: Bundling <bundlename> [<bundlename>, ...]");
+                    return;
+                }
+
+                //try
+                //{
                 var bundles = new ModBundleManager(definitionsFile);
                 if (args[0] == "--all")
                     bundles.BundleAll();
                 else
-                    foreach(var bundleName in args)
+                    foreach (var bundleName in args)
                         bundles.Bundle(bundles.GetModBundleDefinition(bundleName));
 
                 Debug.WriteLine("Done!");
-            //}
-            //catch(FileNotFoundException)
-            //{
-            //    Debug.WriteLine("No definitions found; creating example file");
-            //    ModBundleManager.CreateSampleFile(definitionsFile);
-            //}
-            //catch(Exception ex)
-            //{
-            //    PrintExceptionRecursive(ex);
-            //}
+                //}
+                //catch(FileNotFoundException)
+                //{
+                //    Debug.WriteLine("No definitions found; creating example file");
+                //    ModBundleManager.CreateSampleFile(definitionsFile);
+                //}
+                //catch(Exception ex)
+                //{
+                //    PrintExceptionRecursive(ex);
+                //}
+            }
+            else
+            {
+                Application.Run(new frmMain());
+            }
         }
 
         private static void PrintExceptionRecursive(Exception ex)

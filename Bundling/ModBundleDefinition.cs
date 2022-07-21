@@ -24,17 +24,20 @@ namespace Bundling
         public virtual string AssetBundleName { get; set; }
 
         [JsonProperty("dependencies")]
-        public virtual string[] Dependencies
-        { get; set; }
+        public virtual string[] Dependencies { get; set; } = new string[0];
 
         [JsonProperty("excludePatterns")]
-        public virtual string[]  ExcludePatterns
-        { get; set; }
+        public virtual string[]  ExcludePatterns { get; set; } = new string[0];
 
         [JsonProperty("deploy")]
         public virtual bool Deploy { get; set; }
 
         [JsonProperty("minify")]
         public virtual bool Minify { get; set; }
+
+        public override string ToString()
+        {
+            return BundleName;
+        }
     }
 }

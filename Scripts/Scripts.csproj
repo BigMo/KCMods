@@ -535,6 +535,9 @@
     <Compile Include="AutoTrade\Loader.cs" />
     <Compile Include="AutoTrade\Patches.cs" />
     <Compile Include="AutoTrade\AutoTradeSettings.cs" />
+    <Compile Include="Unlocker\dnlib.dll.bin.cs" />
+    <Compile Include="Unlocker\Loader.cs" />
+    <Compile Include="Unlocker\ReflectionUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Shared\Zat.AssetLoading.cs" />
