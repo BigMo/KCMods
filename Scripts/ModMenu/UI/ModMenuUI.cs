@@ -158,7 +158,7 @@ namespace Zat.ModMenu.UI
         }
         private void Update()
         {
-            if (Input.GetKeyDown(menuSettings?.ToggleKey?.Key ?? KeyCode.O))
+            if (GameState.inst.AlphaNumericHotkeysEnabled && Input.GetKeyDown(menuSettings?.ToggleKey?.Key ?? KeyCode.O))
                 if (ui != null) ui.SetActive(!ui.activeSelf);
         }
 
